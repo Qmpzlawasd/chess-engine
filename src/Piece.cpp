@@ -49,7 +49,7 @@ public:
         {
             Utils::showBitBoard(this->getBlack());
         }
-        return 1;
+        return attackTable;
     }
 };
 
@@ -80,19 +80,48 @@ public:
 };
 class King : public Piece
 {
-    const uint64_t movePiece(const uint64_t &board, const uint8_t &index) const override { return 1; };
+    const uint64_t movePiece(const uint64_t &board, const uint8_t &index) const override{
+
+    };
 
 public:
     King(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece{whiteConfiguration, blackConfiguration} {};
-    const uint64_t getPseudoLegalMoves(const bool &turn) const override { return 1; };
+    const uint64_t getPseudoLegalMoves(const bool &turn) const override{
+
+    };
 };
 
 class Knight : public Piece
 {
 
-    const uint64_t movePiece(const uint64_t &board, const uint8_t &index) const override { return 1; };
+    const uint64_t movePiece(const uint64_t &board, const uint8_t &index) const override
+    {
+        uint64_t attackTable{0};
+                
+        
+    };
 
 public:
     Knight(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece{whiteConfiguration, blackConfiguration} {};
-    const uint64_t getPseudoLegalMoves(const bool &turn) const override { return 1; };
+    const uint64_t getPseudoLegalMoves(const bool &turn) const override
+    {
+        uint64_t attackTable{0};
+        if (turn == Utils::WHITE)
+        {
+            Utils::showBitBoard(this->getWhite());
+            for (uint8_t i = 0; i < Utils::COLUMN_NUMBER * Utils::ROW_NUMBER; i++)
+            {
+                if (this->getWhite() >> i & 1)
+                {
+                    std::cout << (this->getWhite() >> i & 1) << '\n';
+                    attackTable |= this->movePiece(this->getWhite(), i);
+                }
+            }
+        }
+        else
+        {
+            Utils::showBitBoard(this->getBlack());
+        }
+        return attackTable;
+    };
 };

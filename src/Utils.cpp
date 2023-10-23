@@ -22,6 +22,10 @@ public:
     {
         return 1 << pos;
     }
+    static const uint8_t getIthRank(const uint64_t &table, const int &I)
+    {
+        return (table >> I) & 0xff;
+    }
 };
 class FEN
 {

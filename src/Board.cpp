@@ -41,6 +41,41 @@ public:
                (pawns.getWhite()) |
                (rooks.getWhite());
     }
+    const uint64_t getFullWhiteSquares() const
+    {
+        return king.getWhite() |
+               queens.getWhite() |
+               rooks.getWhite() |
+               bishops.getWhite() |
+               knights.getWhite() |
+               pawns.getWhite();
+    }
+
+    const uint64_t getFullBlackSquares() const
+    {
+        return king.getBlack() |
+               queens.getBlack() |
+               rooks.getBlack() |
+               bishops.getBlack() |
+               knights.getBlack() |
+               pawns.getBlack();
+    }
+    const uint64_t getEmptySquares() const
+    {
+        return ~(king.getBlack()) |
+               (queens.getBlack()) |
+               (knights.getBlack()) |
+               (bishops.getBlack()) |
+               (pawns.getBlack()) |
+               (rooks.getBlack()) |
+               (king.getWhite()) |
+               (queens.getWhite()) |
+               (knights.getWhite()) |
+               (bishops.getWhite()) |
+               (pawns.getWhite()) |
+               (rooks.getWhite());
+    }
+    
 
 public:
     Board(const std::string &fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq f1 0 1")
@@ -57,5 +92,6 @@ public:
           fullmoveNumber{FEN::getFullmoveNumber(fen)} {};
 
     ~Board() = default;
-    void makeMove() {};
+
+    void makeMove() { knights.getPseudoLegalMoves(1); };
 };
