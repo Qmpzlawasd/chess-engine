@@ -1,43 +1,67 @@
 #pragma once
-#include <math.h>
 
 class Utils
 {
+private:
+    static void showReversedBin(int8_t nr)
+    {
+        for (size_t i = 0; i < 8; i++)
+        {
+            std::cout << ((nr >> i) & 1)<< "-";
+        }
+        std::cout << "\n";
+    }
+
 public:
     static const bool WHITE = true;
     static const bool BLACK = false;
+
     static const uint8_t ROW_NUMBER{8};
     static const uint8_t COLUMN_NUMBER{8};
 
-    static void showBitBoard(uint64_t board)
+    static const uint64_t A_FILE = 0x0101010101010101;
+    static const uint64_t H_FILE = 0x8080808080808080;
+    static const uint64_t FIRST_ROW = 0x00000000000000ff;
+
+    static void showBitBoard(const uint64_t &board)
     {
         // for (int8_t i = 0; i < ROW_NUMBER ; i++)
         for (int8_t i = ROW_NUMBER - 1; i >= 0; i--)
         {
-            std::cout << std::bitset<ROW_NUMBER>{((board >> (i * ROW_NUMBER)) & ((unsigned int)std::pow(2, ROW_NUMBER) - 1))} << "\n";
+            showReversedBin((board >> (i * ROW_NUMBER)) & ((unsigned int)(1 << ROW_NUMBER) - 1));
         }
+            printf("\n");
     }
 
-    static const uint64_t setBit(const uint8_t &pos)
+    /**
+     * @param[in] value bitboard
+     * @param[in] value in rage from 0 to 7
+     */
+    static const uint64_t getIthFile(const uint64_t &table, const int &I)
     {
-        return 1 << pos;
+        return table & A_FILE >> I;
     }
-    static const uint8_t getIthRank(const uint64_t &table, const int &I)
+
+    /**
+     * @param[in] value bitboard
+     * @param[in] value in rage from 0 to 7
+     */
+    static const uint64_t getIthRank(const uint64_t &table, const int &I)
     {
-        return (table >> I) & 0xff;
+        return table & FIRST_ROW << I * 8;
     }
 };
 class FEN
 {
 public:
     FEN() = default;
-    static const bool getTurn(const std::string &fen)
+    static const bool parseTurn(const std::string &fen)
     {
         size_t firstSpace = fen.find(' ');
         return (fen[firstSpace + 1] == 'w' ? true : false);
     }
 
-    static const std::bitset<4> getCastle(const std::string &fen)
+    static const std::bitset<4> parseCastle(const std::string &fen)
     {
         size_t firstSpace = fen.find(' ');
         size_t secondSpace = fen.find(' ', firstSpace + 1);
@@ -52,7 +76,7 @@ public:
         return asd;
     }
 
-    static const uint8_t getEnPassant(const std::string &fen)
+    static const std::string parseEnPassant(const std::string &fen)
     {
         size_t firstSpace = fen.find(' ');
         size_t secondSpace = fen.find(' ', firstSpace + 1);
@@ -61,16 +85,12 @@ public:
         std::string cat = fen.substr(thirdSpace + 1, forthSpace - thirdSpace - 1);
 
         if (cat == "-")
-            return 0;
+            return "-";
 
-        char column{cat[0]}, line{cat[1]};
-        column = column - 'a';
-        line = atoi(&line) - 1;
-
-        return Utils::COLUMN_NUMBER * line + Utils::ROW_NUMBER - 1 - column;
+        return cat;
     }
 
-    static const uint8_t getHalfmoveClock(const std::string &fen)
+    static const uint8_t parseHalfmoveClock(const std::string &fen)
     {
         size_t firstSpace = fen.find(' ');
         size_t secondSpace = fen.find(' ', firstSpace + 1);
@@ -78,10 +98,14 @@ public:
         size_t forthSpace = fen.find(' ', thirdSpace + 1);
         size_t fifthSpace = fen.find(' ', forthSpace + 1);
         std::string cat = fen.substr(forthSpace + 1, fifthSpace - forthSpace - 1);
-        return stoi(cat);
+        std::cout << stoi(cat);
+        uint8_t asd = stoi(cat);
+        std::cout << asd;
+
+        return asd;
     }
 
-    static const uint16_t getFullmoveNumber(const std::string &fen)
+    static const uint16_t parseFullmoveNumber(const std::string &fen)
     {
         size_t firstSpace = fen.find(' ');
         size_t secondSpace = fen.find(' ', firstSpace + 1);
@@ -116,7 +140,7 @@ public:
             }
             else if (ch == piece)
             {
-                uint64_t formula = (uint64_t)1 << (Utils::COLUMN_NUMBER * Utils::ROW_NUMBER - 1) - (Utils::ROW_NUMBER - 1 - columnIndex + Utils::ROW_NUMBER * slashesMet); // hell
+                const uint64_t formula = (uint64_t)1 << Utils::COLUMN_NUMBER * Utils::ROW_NUMBER - slashesMet * Utils::ROW_NUMBER - (Utils::ROW_NUMBER - columnIndex);
                 bitboard |= formula;
                 ++columnIndex;
             }
