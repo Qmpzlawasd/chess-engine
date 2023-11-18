@@ -7,7 +7,7 @@ private:
     {
         for (size_t i = 0; i < 8; i++)
         {
-            std::cout << ((nr >> i) & 1)<< "-";
+            std::cout << ((nr >> i) & 1) << "-";
         }
         std::cout << "\n";
     }
@@ -30,7 +30,7 @@ public:
         {
             showReversedBin((board >> (i * ROW_NUMBER)) & ((unsigned int)(1 << ROW_NUMBER) - 1));
         }
-            printf("\n");
+        printf("\n");
     }
 
     /**
@@ -76,7 +76,7 @@ public:
         return asd;
     }
 
-    static const std::string parseEnPassant(const std::string &fen)
+    static const uint64_t parseEnPassant(const std::string &fen)
     {
         size_t firstSpace = fen.find(' ');
         size_t secondSpace = fen.find(' ', firstSpace + 1);
@@ -85,9 +85,12 @@ public:
         std::string cat = fen.substr(thirdSpace + 1, forthSpace - thirdSpace - 1);
 
         if (cat == "-")
-            return "-";
+            return 0;
 
-        return cat;
+        const uint8_t number = cat[1] - '1';
+        const uint8_t letter = cat[0] - 'a';
+
+        return (uint64_t)1 << Utils::ROW_NUMBER * number + letter;
     }
 
     static const uint8_t parseHalfmoveClock(const std::string &fen)

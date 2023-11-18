@@ -21,7 +21,7 @@ public:
      * etc.
      */
     std::bitset<4> castle;
-    std::string enPassant;
+    uint64_t enPassant;
     uint8_t halfmoveClock;
     uint16_t fullmoveNumber;
 
@@ -64,18 +64,7 @@ public:
 
     const uint64_t getEmptySquares() const
     {
-        return ~(king.getBlack()) |
-               (queens.getBlack()) |
-               (knights.getBlack()) |
-               (bishops.getBlack()) |
-               (pawns.getBlack()) |
-               (rooks.getBlack()) |
-               (king.getWhite()) |
-               (queens.getWhite()) |
-               (knights.getWhite()) |
-               (bishops.getWhite()) |
-               (pawns.getWhite()) |
-               (rooks.getWhite());
+        return ~(getFullBlackSquares() | getFullWhiteSquares());
     }
 
     void printBoard(std::ostream &os) const
@@ -113,15 +102,14 @@ public:
 
     const uint64_t getKightMoves(const bool &side) const
     {
-        const uint64_t pieceBitboard = side ? knights.getWhite() : knights.getBlack();
-        const uint64_t allyPieces = side ? this->getFullWhiteSquares() : this->getFullBlackSquares();
+        const uint64_t pieceBitboard = side == Utils::WHITE ? knights.getWhite() : knights.getBlack();
+        const uint64_t allyPieces = side == Utils::WHITE ? this->getFullWhiteSquares() : this->getFullBlackSquares();
 
         constexpr uint64_t B_FILE = Utils::A_FILE << 1;
         constexpr uint64_t G_FILE = Utils::H_FILE >> 1;
 
         constexpr uint64_t SECOND_ROW = Utils::FIRST_ROW << Utils::ROW_NUMBER * 1;
-        constexpr uint64_t EIGHTH_ROW = Utils::FIRST_ROW << Utils::ROW_NUMBER * 7;
-
+        constexpr uint64_t EIGHTH_ROW = Utils::FIRST_ROW << Utils::ROW_NUMBER * (Utils::ROW_NUMBER - 1);
         constexpr uint64_t SEVENTH_ROW = EIGHTH_ROW >> 1;
 
         const uint64_t attackLeftUpUp = (pieceBitboard & ~(SEVENTH_ROW | EIGHTH_ROW | Utils::A_FILE)) << Utils::ROW_NUMBER * 2 - 1;
@@ -138,10 +126,33 @@ public:
         return (attackLeftUpUp | attackLeftUpLeft | attackLeftDownDown | attackLeftDownLeft | attackRightUpUp | attackRightUpRight | attackRightDownDown | attackRightDownRight) & ~allyPieces;
     }
 
+    const uint64_t getPawnMoves(const bool &side) const
+    {
+        const uint64_t pieceBitboard = side == Utils::WHITE ? pawns.getWhite() : pawns.getBlack();
+
+        uint64_t forwardMove, attackLeft, attackRight;
+        if (side == Utils::WHITE)
+        {
+            forwardMove = pieceBitboard << Utils::ROW_NUMBER;
+            attackLeft = ((pieceBitboard & ~Utils::A_FILE) << Utils::ROW_NUMBER - 1) & (getFullBlackSquares() | enPassant);
+            attackRight = ((pieceBitboard & ~Utils::H_FILE) << Utils::ROW_NUMBER + 1) & (getFullBlackSquares() | enPassant);
+        }
+        else
+        {
+            // move orientations are reversed
+            forwardMove = pieceBitboard >> Utils::ROW_NUMBER;
+            attackLeft = ((pieceBitboard & ~Utils::H_FILE) >> Utils::ROW_NUMBER - 1) & (getFullWhiteSquares() | enPassant);
+            attackRight = ((pieceBitboard & ~Utils::A_FILE) >> Utils::ROW_NUMBER + 1) & (getFullWhiteSquares() | enPassant);
+        }
+        forwardMove = forwardMove & getEmptySquares();
+
+        return forwardMove | attackLeft | attackRight;
+    }
+
     const uint64_t getKingMoves(const bool &side) const
     {
-        const uint64_t pieceBitboard = side ? king.getWhite() : king.getBlack();
-        const uint64_t allyPieces = side ? this->getFullWhiteSquares() : this->getFullBlackSquares();
+        const uint64_t pieceBitboard = side == Utils::WHITE ? king.getWhite() : king.getBlack();
+        const uint64_t allyPieces = side == Utils::WHITE ? this->getFullWhiteSquares() : this->getFullBlackSquares();
 
         const uint64_t attackLeft = (pieceBitboard & ~Utils::A_FILE) >> 1;
         const uint64_t attackRight = (pieceBitboard & ~Utils::H_FILE) << 1;
