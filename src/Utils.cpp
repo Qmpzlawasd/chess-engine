@@ -13,15 +13,15 @@ private:
     }
 
 public:
-    static const bool WHITE = true;
-    static const bool BLACK = false;
+    static constexpr bool WHITE = true;
+    static constexpr bool BLACK = false;
 
-    static const uint8_t ROW_NUMBER{8};
-    static const uint8_t COLUMN_NUMBER{8};
+    static constexpr uint8_t ROW_NUMBER{8};
+    static constexpr uint8_t COLUMN_NUMBER{8};
 
-    static const uint64_t A_FILE = 0x0101010101010101;
-    static const uint64_t H_FILE = 0x8080808080808080;
-    static const uint64_t FIRST_ROW = 0x00000000000000ff;
+    static constexpr uint64_t A_FILE = 0x0101010101010101;
+    static constexpr uint64_t H_FILE = 0x8080808080808080;
+    static constexpr uint64_t FIRST_ROW = 0x00000000000000ff;
 
     static void showBitBoard(const uint64_t &board)
     {
@@ -101,9 +101,7 @@ public:
         size_t forthSpace = fen.find(' ', thirdSpace + 1);
         size_t fifthSpace = fen.find(' ', forthSpace + 1);
         std::string cat = fen.substr(forthSpace + 1, fifthSpace - forthSpace - 1);
-        std::cout << stoi(cat);
         uint8_t asd = stoi(cat);
-        std::cout << asd;
 
         return asd;
     }
