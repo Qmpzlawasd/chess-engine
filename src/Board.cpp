@@ -154,8 +154,16 @@ public:
     template <bool side>
     const uint64_t getKightMoves() const
     {
-        const uint64_t pieceBitboard = side == Utils::WHITE ? knights.getWhite() : knights.getBlack();
-        const uint64_t allyPieces = side == Utils::WHITE ? this->getFullWhiteSquares() : this->getFullBlackSquares();
+        uint64_t pieceBitboard;
+        if constexpr (side == Utils::WHITE)
+            pieceBitboard = knights.getWhite();
+        else
+            pieceBitboard = knights.getBlack();
+
+        if constexpr (side == Utils::WHITE)
+            this->getFullWhiteSquares();
+        else
+            this->getFullBlackSquares();
 
         constexpr uint64_t B_FILE = Utils::A_FILE << 1;
         constexpr uint64_t G_FILE = Utils::H_FILE >> 1;
@@ -198,9 +206,9 @@ public:
     {
         uint64_t pieceBitboard;
         if constexpr (side == Utils::WHITE)
-            pieceBitboard = rooks.getWhite();
+            pieceBitboard = pawns.getWhite();
         else
-            pieceBitboard = rooks.getBlack();
+            pieceBitboard = pawns.getBlack();
 
         uint64_t forwardMove, attackLeft, attackRight;
         if constexpr (side == Utils::WHITE)
@@ -226,9 +234,9 @@ public:
     {
         uint64_t pieceBitboard;
         if constexpr (side == Utils::WHITE)
-            pieceBitboard = rooks.getWhite();
+            pieceBitboard = king.getWhite();
         else
-            pieceBitboard = rooks.getBlack();
+            pieceBitboard = king.getBlack();
 
         const uint64_t allyPieces;
         if constexpr (side == Utils::WHITE)
