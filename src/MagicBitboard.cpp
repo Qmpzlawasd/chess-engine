@@ -1,11 +1,11 @@
 #pragma once
-#include <unordered_map>
 #include "Utils.cpp"
 #include "Piece.cpp"
 
 class MagicBitboard
 {
     static constexpr uint64_t NONE = 0xffffffffffffffff;
+    static constexpr uint64_t BITS_IN_BYTE = 8;
 
     // static const bool checkCollision(const uint64_t &key, const std::unordered_map<uint64_t, uint64_t>& magic )
     // {
@@ -30,8 +30,7 @@ public:
             magic.clear();
             while (true)
             {
-
-                magic[subset] = generateGoodPattern(subset) * MAGIC_NUMBER >> sizeof(KeyType);
+                magic[subset] = generateGoodPattern(subset) * MAGIC_NUMBER >> sizeof(KeyType) * BITS_IN_BYTE; // does it work???? idk
                 subset = pattern & (subset | ~pattern) + 1;
                 if (subset == 0 or magic.contains(subset))
                 {

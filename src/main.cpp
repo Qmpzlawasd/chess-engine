@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstdint>
 #include <bitset>
+#include <unordered_map>
 #include "Utils.cpp"
 #include "MagicBitboard.cpp"
 #include "Piece.cpp"

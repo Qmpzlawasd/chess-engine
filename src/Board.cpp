@@ -1,6 +1,5 @@
 #pragma once
 #include "Utils.cpp"
-#include <unordered_map>
 #include "Piece.cpp"
 
 enum Square
@@ -159,11 +158,12 @@ public:
             pieceBitboard = knights.getWhite();
         else
             pieceBitboard = knights.getBlack();
-
+            
+        constexpr uint64_t allyPieces;
         if constexpr (side == Utils::WHITE)
-            this->getFullWhiteSquares();
+            allyPieces = this->getFullWhiteSquares();
         else
-            this->getFullBlackSquares();
+            allyPieces = this->getFullBlackSquares();
 
         constexpr uint64_t B_FILE = Utils::A_FILE << 1;
         constexpr uint64_t G_FILE = Utils::H_FILE >> 1;
@@ -238,11 +238,11 @@ public:
         else
             pieceBitboard = king.getBlack();
 
-        const uint64_t allyPieces;
+        constexpr uint64_t allyPieces;
         if constexpr (side == Utils::WHITE)
-            this->getFullWhiteSquares();
+            allyPieces = this->getFullWhiteSquares();
         else
-            this->getFullBlackSquares();
+            allyPieces = this->getFullBlackSquares();
 
         const uint64_t attackLeft = (pieceBitboard & ~Utils::A_FILE) >> 1;
         const uint64_t attackRight = (pieceBitboard & ~Utils::H_FILE) << 1;
