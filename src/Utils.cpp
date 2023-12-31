@@ -46,6 +46,15 @@ public:
      * @param[in] value bitboard
      * @param[in] value in rage from 0 to 7
      */
+    static const uint64_t setSquare(const Square &square)
+    {
+        return (uint64_t)1 << square;
+    }
+
+    /**
+     * @param[in] value bitboard
+     * @param[in] value in rage from 0 to 7
+     */
     static const uint64_t getIthRank(const uint64_t &table, const int &I)
     {
         return table & FIRST_ROW << I * 8;
