@@ -1,4 +1,5 @@
 #pragma once
+#include "Squares.cpp"
 
 class Utils
 {
@@ -99,7 +100,7 @@ public:
         const uint8_t number = cat[1] - '1';
         const uint8_t letter = cat[0] - 'a';
 
-        return (uint64_t)1 << Utils::ROW_NUMBER * number + letter;
+        return (uint64_t)1 << (Utils::ROW_NUMBER * number + letter);
     }
 
     static const uint8_t parseHalfmoveClock(const std::string &fen)
@@ -150,7 +151,7 @@ public:
             }
             else if (ch == piece)
             {
-                const uint64_t formula = (uint64_t)1 << Utils::COLUMN_NUMBER * Utils::ROW_NUMBER - slashesMet * Utils::ROW_NUMBER - (Utils::ROW_NUMBER - columnIndex);
+                const uint64_t formula = (uint64_t)1 << (Utils::COLUMN_NUMBER * Utils::ROW_NUMBER - slashesMet * Utils::ROW_NUMBER - (Utils::ROW_NUMBER - columnIndex));
                 bitboard |= formula;
                 ++columnIndex;
             }

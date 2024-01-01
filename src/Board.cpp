@@ -1,6 +1,9 @@
 #pragma once
 #include "Utils.cpp"
 #include "Piece.cpp"
+#include "MagicBoardGenerator.cpp"
+#include "MagicBitboard.cpp"
+#include "ParallelGenerator.cpp"
 
 class Board
 {
@@ -131,13 +134,13 @@ public:
 
         Utils::showBitBoard(naiveAttackPattern);
 
-        std::vector<std::unordered_map<uint64_t, uint64_t>> magic(Utils::COLUMN_NUMBER * Utils::ROW_NUMBER);
-        std::jthread thr{[]{ std::cout << "Joinable std::thread" << std::endl; }};
-        if (MagicBitboard::generateRookPattern(magic, naiveAttackPattern))
-        {
-            return 0;
-        }
-        return (uint64_t)~0;
+        // std::vector<std::unordered_map<uint64_t, uint64_t>> magic(Utils::COLUMN_NUMBER * Utils::ROW_NUMBER);
+
+        std::shared_ptr<MagicBoardGenerator> base = std::make_shared<ParallelGenerator>(ParallelGenerator{});
+
+        const MagicBitboard magicBoard{base}; 
+        magicBoard.magicGenerator->generate();
+        return 0;
     }
 
     template <bool side>
