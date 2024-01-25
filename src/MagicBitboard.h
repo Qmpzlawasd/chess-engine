@@ -1,12 +1,12 @@
 #pragma once
-#include "MagicBoardGenerator.cpp"
-#include "Piece.cpp"
-#include "Utils.cpp"
+
+#include "MagicBitboard.h"
+#include "MagicBoardGenerator.h"
 #include <memory>
 
 class MagicBitboard {
   public:
     std::shared_ptr<MagicBoardGenerator> magicGenerator;
-    MagicBitboard(std::shared_ptr<MagicBoardGenerator> &_magicGenerator)
+    explicit MagicBitboard(std::shared_ptr<MagicBoardGenerator> &_magicGenerator)
         : magicGenerator{_magicGenerator} {};
 };

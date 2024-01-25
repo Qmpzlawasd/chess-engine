@@ -1,20 +1,19 @@
 #pragma once
-#include "MagicBoardGenerator.cpp"
-#include "MagicValues.cpp"
-#include "Piece.cpp"
-#include "Squares.cpp"
-#include "Utils.cpp"
-#include <functional>
-#include <iostream>
+#include "Squares.h"
 #include <thread>
+#include <functional>
 #include <unordered_map>
 #include <vector>
+#include "MagicBitboard.h"
+#include "MagicBoardGenerator.h"
+#include "Piece.h"
+#include <bitset>
 
 class ParallelGenerator : public MagicBoardGenerator {
   private:
-    static const void tryMagicNumber(const uint64_t &magicNumber,
+    static void tryMagicNumber(const uint64_t &magicNumber,
                                      const uint64_t &pattern,
-                                     std::function<bool(uint64_t, uint64_t)> function) {
+                                     const std::function<bool(uint64_t, uint64_t)>& function) {
         uint64_t subset = 0;
         do {
             __uint128_t asd = subset * magicNumber;
@@ -32,7 +31,7 @@ class ParallelGenerator : public MagicBoardGenerator {
         constexpr uint8_t start = 0;
         std::vector<std::thread> searchThreads;
         for (uint8_t i = start; i < count; i++) {
-            searchThreads.push_back(std::thread(getMagicNumber, (Square)i));
+            searchThreads.emplace_back(getMagicNumber, (Square)i);
         }
         for (uint8_t i = start; i < count; i++) {
             searchThreads[i].join();
@@ -64,12 +63,12 @@ class ParallelGenerator : public MagicBoardGenerator {
     };
 
   public:
-    const std::vector<uint64_t> generate() const noexcept override {
+     [[nodiscard]] std::vector<uint64_t> generate() const noexcept override {
         threadStart(64);
         return std::vector<uint64_t>{};
     }
 
-    const std::vector<std::vector<uint64_t>>
+    [[nodiscard]]  std::vector<std::vector<uint64_t>>
     getTables(const uint64_t &size,
               const uint64_t ROOK_MAGIC_VALS[],
               const uint8_t &rookShift) const noexcept override {
@@ -80,7 +79,7 @@ class ParallelGenerator : public MagicBoardGenerator {
             tryMagicNumber(ROOK_MAGIC_VALS[i],
                            Rook::getNaiveAttackPattern((Square)i),
                            [&bitboard, &i](const uint64_t &key, const uint64_t &subset) {
-                               if (bitboard[i][key] != -1) {
+                               if (bitboard[i][key] != (uint64_t) -1) {
                                    puts("PANIC");
                                    return false;
                                }

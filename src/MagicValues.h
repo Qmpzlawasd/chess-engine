@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 
+
 static constexpr uint8_t ROOK_SHIFT = 48;
 static constexpr uint64_t ROOK_CONSTANTS[] = {
     22669931258672306, 281488098640071,   282863434403355,    308276354924931,
