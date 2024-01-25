@@ -1,5 +1,10 @@
+.vscode/
+.idea/
+build/
+
 main
 tempCodeRunnerFile.cpp
+*.yml
 
 # Prerequisites
 *.d
