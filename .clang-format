@@ -1,5 +1,5 @@
 IndentWidth:     4
-ColumnLimit:     100
+ColumnLimit:     140
 AlignConsecutiveMacros: true
 
 AlignArrayOfStructures: Left
