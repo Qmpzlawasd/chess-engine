@@ -1,4 +1,3 @@
-SHELL=/bin/bash
 CC = g++
 CFLAGS = -I $(SRC_DIR) -Wall -std=c++20 -pthread
 
@@ -19,5 +18,3 @@ pre-build:
 
 engine: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 	$(CC) -o $(BUILD_DIR)/$(TARGET) $(ENGINE_SRCS) $(CFLAGS)
-
-.PHONY: all clean
