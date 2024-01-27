@@ -54,28 +54,29 @@ template <bool side> [[nodiscard]] uint64_t Board::getKightMoves() const {
 }
 
 [[nodiscard]] uint64_t Board::getRookMoves(const Square &square) const {
-
-    std::shared_ptr<MagicValuesGeneratorInterface> base = std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator());
-    const MagicBitboard magicBoard{base};
-
-    std::vector<std::vector<uint64_t>> asd;
-    asd = magicBoard.magicGenerator->getTables(65536);
     const uint64_t blockerPattern = Rook::getNaiveAttackPattern(square) & ~getEmptySquares();
-    Utils::showBitBoard(blockerPattern);
 
-    return asd[square][blockerPattern * ROOK_CONSTANTS[square] >> ROOK_SHIFT];
+    std::shared_ptr<MagicValuesGeneratorInterface> valueGenerator =
+        std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator(ROOK_SHIFT, blockerPattern));
+    const MagicBitboard magicBoard{valueGenerator};
+
+    std::vector<std::vector<uint64_t>> rookMoveTable;
+    rookMoveTable = magicBoard.magicGenerator->getTables(ROOK_CONSTANTS, rooks);
+
+    return rookMoveTable[square][blockerPattern * ROOK_CONSTANTS[square] >> ROOK_SHIFT];
 }
 
 [[nodiscard]] uint64_t Board::getBishopMoves(const Square &square) const {
-    std::shared_ptr<MagicValuesGeneratorInterface> base = std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator());
+    const uint64_t blockerPattern = Bishop::getNaiveAttackPattern(square) & ~getEmptySquares();
+
+    std::shared_ptr<MagicValuesGeneratorInterface> base =
+        std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator{BISHOP_SHIFT, blockerPattern});
     const MagicBitboard magicBoard{base};
 
-    std::vector<std::vector<uint64_t>> asd;
-    asd = magicBoard.magicGenerator->getTables(65536);
-    const uint64_t blockerPattern = Bishop::getNaiveAttackPattern(square) & ~getEmptySquares();
-    Utils::showBitBoard(blockerPattern);
+    std::vector<std::vector<uint64_t>> bishopMoveTable;
+    bishopMoveTable = magicBoard.magicGenerator->getTables(BISHOP_CONSTANTS, bishops);
 
-    return asd[square][blockerPattern * ROOK_CONSTANTS[square] >> ROOK_SHIFT];
+    return bishopMoveTable[square][blockerPattern * BISHOP_CONSTANTS[square] >> BISHOP_SHIFT];
 }
 
 template <bool side> [[nodiscard]] uint64_t Board::getPawnMoves() const {
