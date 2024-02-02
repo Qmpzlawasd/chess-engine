@@ -8,7 +8,6 @@
 #include "Board.h"
 #include "FEN.h"
 #include "MagicBitboard.h"
-#include "MagicValues.h"
 #include "MagicValuesGeneratorInterface.h"
 #include "MagicValuesParallelGenerator.h"
 #include "Piece.h"
@@ -64,15 +63,15 @@ class Board {
 
     ~Board() = default;
 
-    template <bool side> [[nodiscard]] uint64_t getKightMoves() const;
+    template <bool side> [[nodiscard]] uint64_t getKightMoves(const Square &) const;
 
     [[nodiscard]] uint64_t getRookMoves(const Square &square) const;
 
     [[nodiscard]] uint64_t getBishopMoves(const Square &square) const;
 
-    template <bool side> [[nodiscard]] uint64_t getPawnMoves() const;
+    template <bool side> [[nodiscard]] uint64_t getPawnMoves(const Square &) const;
 
-    template <bool side> [[nodiscard]] uint64_t getKingMoves() const;
+    template <bool side> [[nodiscard]] uint64_t getKingMoves(const Square &) const;
 
     friend std::ostream &operator<<(std::ostream &os, const Board &board) {
         board.printStatus(os);
