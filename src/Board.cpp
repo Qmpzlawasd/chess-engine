@@ -17,12 +17,8 @@ void Board::printStatus(std::ostream &os) const {
        << enPassant << "\t" << (castle[0] ? "K" : "") << (castle[2] ? "k" : "") << "\n";
 }
 
-template <bool side> [[nodiscard]] uint64_t Board::getKightMoves() const {
-    uint64_t pieceBitboard;
-    if constexpr (side == Utils::WHITE)
-        pieceBitboard = knights.getWhite();
-    else
-        pieceBitboard = knights.getBlack();
+template <bool side> [[nodiscard]] uint64_t Board::getKightMoves(const Square &square) const {
+    const uint64_t pieceBitboard = Utils::setSquare(square);
 
     constexpr uint64_t allyPieces;
     if constexpr (side == Utils::WHITE)
@@ -54,37 +50,34 @@ template <bool side> [[nodiscard]] uint64_t Board::getKightMoves() const {
 }
 
 [[nodiscard]] uint64_t Board::getRookMoves(const Square &square) const {
-    const uint64_t blockerPattern = Rook::getNaiveAttackPattern(square) & ~getEmptySquares();
+    const uint64_t blockerPattern = rooks.getNaiveAttackPattern(square) & ~getEmptySquares();
 
     std::shared_ptr<MagicValuesGeneratorInterface> valueGenerator =
-        std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator(ROOK_SHIFT, blockerPattern));
+        std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator{});
     const MagicBitboard magicBoard{valueGenerator};
 
     std::vector<std::vector<uint64_t>> rookMoveTable;
-    rookMoveTable = magicBoard.magicGenerator->getTables(ROOK_CONSTANTS, rooks);
+    rookMoveTable = magicBoard.magicGenerator->getTables(Rook::MAGIC_CONSTANTS, rooks);
 
-    return rookMoveTable[square][blockerPattern * ROOK_CONSTANTS[square] >> ROOK_SHIFT];
+    const uint64_t optimisedIndex = blockerPattern * Rook::MAGIC_CONSTANTS[square] >> Rook::SHIFT_VALUE;
+    return rookMoveTable[square][optimisedIndex];
 }
 
 [[nodiscard]] uint64_t Board::getBishopMoves(const Square &square) const {
-    const uint64_t blockerPattern = Bishop::getNaiveAttackPattern(square) & ~getEmptySquares();
+    const uint64_t blockerPattern = bishops.getNaiveAttackPattern(square) & ~getEmptySquares();
 
-    std::shared_ptr<MagicValuesGeneratorInterface> base =
-        std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator{BISHOP_SHIFT, blockerPattern});
+    std::shared_ptr<MagicValuesGeneratorInterface> base = std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator{});
     const MagicBitboard magicBoard{base};
 
     std::vector<std::vector<uint64_t>> bishopMoveTable;
-    bishopMoveTable = magicBoard.magicGenerator->getTables(BISHOP_CONSTANTS, bishops);
+    bishopMoveTable = magicBoard.magicGenerator->getTables(Bishop::MAGIC_CONSTANTS, bishops);
 
-    return bishopMoveTable[square][blockerPattern * BISHOP_CONSTANTS[square] >> BISHOP_SHIFT];
+    const uint64_t optimisedIndex = blockerPattern * Bishop::MAGIC_CONSTANTS[square] >> Bishop::SHIFT_VALUE;
+    return bishopMoveTable[square][optimisedIndex];
 }
 
-template <bool side> [[nodiscard]] uint64_t Board::getPawnMoves() const {
-    uint64_t pieceBitboard;
-    if constexpr (side == Utils::WHITE)
-        pieceBitboard = pawns.getWhite();
-    else
-        pieceBitboard = pawns.getBlack();
+template <bool side> [[nodiscard]] uint64_t Board::getPawnMoves(const Square &square) const {
+    const uint64_t pieceBitboard = Utils::setSquare(square);
 
     uint64_t forwardMove, attackLeft, attackRight;
     if constexpr (side == Utils::WHITE) {
@@ -102,12 +95,8 @@ template <bool side> [[nodiscard]] uint64_t Board::getPawnMoves() const {
     return forwardMove | attackLeft | attackRight;
 }
 
-template <bool side> [[nodiscard]] uint64_t Board::getKingMoves() const {
-    uint64_t pieceBitboard;
-    if constexpr (side == Utils::WHITE)
-        pieceBitboard = king.getWhite();
-    else
-        pieceBitboard = king.getBlack();
+template <bool side> [[nodiscard]] uint64_t Board::getKingMoves(const Square &square) const {
+    const uint64_t pieceBitboard = Utils::setSquare(square);
 
     constexpr uint64_t allyPieces;
     if constexpr (side == Utils::WHITE)
@@ -129,3 +118,25 @@ template <bool side> [[nodiscard]] uint64_t Board::getKingMoves() const {
     return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown) &
            ~allyPieces;
 }
+//./build/main
+//               PANIC getTables
+//    8
+//    10294675697872762
+//    PANIC getTables
+//    25
+//    14460703742554276
+//    PANIC getTables
+//    26
+//    2858155501024063
+//    PANIC getTables
+//    34
+//    2415930761804470
+//    PANIC getTables
+//    40
+//    3051551835446002
+//    PANIC getTables
+//    43
+//    2762073245706157
+//    PANIC getTables
+//    50
+//    1909525105686087

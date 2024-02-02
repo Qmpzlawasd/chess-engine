@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -I $(SRC_DIR) -Wall -std=c++20 -pthread
+CFLAGS = -I $(SRC_DIR) -Wall -std=c++23 -pthread
 
 SRC_DIR = src
 BUILD_DIR = build

@@ -1,6 +1,6 @@
 #include "Piece.h"
 
-uint64_t Rook::getNaiveAttackPattern(const Square &square) {
+uint64_t Rook::getNaiveAttackPattern(const Square &square) const noexcept {
     const uint8_t line = square % Utils::ROW_NUMBER;
     const uint8_t column = square / Utils::COLUMN_NUMBER;
 
@@ -10,7 +10,7 @@ uint64_t Rook::getNaiveAttackPattern(const Square &square) {
     return (PIECE_FILE | PIECE_ROW) & ~Utils::setSquare(square);
 }
 
-uint64_t Bishop::getNaiveAttackPattern(const Square &square) {
+uint64_t Bishop::getNaiveAttackPattern(const Square &square) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
     const uint8_t line = square / Utils::COLUMN_NUMBER;
 
@@ -111,4 +111,7 @@ uint64_t Rook::fillPositions(const Square &square, const uint64_t &pattern) cons
 
 uint64_t Queen::fillPositions(const Square &square, const uint64_t &pattern) const noexcept {
     return Rook{}.fillPositions(square, pattern) | Bishop{}.fillPositions(square, pattern);
+}
+uint64_t Queen::getNaiveAttackPattern(const Square &square) const noexcept {
+    return Rook{}.getNaiveAttackPattern(square) | Bishop{}.getNaiveAttackPattern(square);
 }
