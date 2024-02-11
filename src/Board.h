@@ -63,7 +63,7 @@ class Board {
 
     ~Board() = default;
 
-    template <bool side> [[nodiscard]] uint64_t getKightMoves(const Square &) const;
+    template <bool side> [[nodiscard]] uint64_t getKnightMoves(const Square &square) const;
 
     [[nodiscard]] uint64_t getRookMoves(const Square &square) const;
 

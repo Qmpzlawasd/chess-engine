@@ -11,10 +11,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include <cassert>
+
 class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
 
   private:
-    void tryMagicNumber(const uint64_t &magicNumber,
+    bool tryMagicNumber(const uint64_t &magicNumber,
                         const Square &square,
                         const SlidingPiece &slidingPiece,
                         const std::function<bool(uint64_t, uint64_t)> &function) const {
@@ -23,28 +25,28 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
             __uint128_t partialKey = subset * magicNumber;
             const uint64_t key = partialKey >> slidingPiece.getShiftValue();
             if (!function(key, subset)) {
-                return;
+                return false;
             }
 
             subset = slidingPiece.getNaiveAttackPattern(square) & ((subset | ~slidingPiece.getNaiveAttackPattern(square)) + 1);
 
         } while (subset != 0);
+        return true;
     }
 
     void getMagicNumber(const Square &square, const SlidingPiece &slidingPiece) const {
         std::unordered_map<uint64_t, uint64_t> magic;
-        for (uint64_t MAGIC_NUMBER = 281485676593135; MAGIC_NUMBER < 1844670000000000000; MAGIC_NUMBER += 1231823786127) {
+        for (uint64_t MAGIC_NUMBER = 43004830050835876; MAGIC_NUMBER < 1844670000000000000; MAGIC_NUMBER += 1231823786127) {
             magic.clear();
-            tryMagicNumber(MAGIC_NUMBER, square, slidingPiece, [&magic](const uint64_t &key, const uint64_t &subset) -> bool {
-                if (magic.contains(key)) {
-                    return false;
-                }
-                magic[key] = 1;
-                return true;
-            });
-            if (magic.size() == Utils::NUMBER_SQUARES_TABLE) {
-                printf("Magic number %ld found for square %d\n", MAGIC_NUMBER, square);
+            if (tryMagicNumber(MAGIC_NUMBER, square, slidingPiece, [&magic](const uint64_t &key, const uint64_t &subset) -> bool {
+                    if (magic.contains(key)) {
+                        return false;
+                    }
 
+                    magic[key] = 1;
+                    return true;
+                })) {
+                printf("Magic number %ld found for square %d\n", MAGIC_NUMBER, square);
                 return;
             }
         }
@@ -61,10 +63,7 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
                                        (Square)i,
                                        std::ref(slidingPiece));
         }
-
-        for (auto &thread : searchThreads) {
-            thread.join();
-        }
+        std::for_each(searchThreads.begin(), searchThreads.end(), [](std::thread &thread) -> void { thread.join(); });
     }
 
   public:
@@ -74,6 +73,7 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
 
     [[nodiscard]] std::vector<std::vector<uint64_t>> getTables(const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &magicValues,
                                                                const SlidingPiece &slidingPiece) const noexcept override {
+
         const uint64_t tableSize = 1 << (Utils::NUMBER_SQUARES_TABLE - slidingPiece.getShiftValue());
         std::vector<std::vector<uint64_t>> bitboard(Utils::NUMBER_SQUARES_TABLE, std::vector<uint64_t>(tableSize, -1));
 
@@ -81,15 +81,8 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
             tryMagicNumber(magicValues[square],
                            Square(square),
                            slidingPiece,
-                           [&magicValues, &bitboard, &square, &slidingPiece](const uint64_t &key, const uint64_t &subset) -> bool {
-                               if (bitboard[square][key] != (uint64_t)-1) {
-                                   puts("PANIC getTables");
-                                   std::cout << (int)square << '\n';
-                                   std::cout << magicValues[square] << '\n';
-
-                                   return false;
-                               }
-
+                           [&tableSize, &bitboard, &square, &slidingPiece](const uint64_t &key, const uint64_t &subset) -> bool {
+                               assert(bitboard[square][key] == (uint64_t)-1);
                                bitboard[square][key] = slidingPiece.fillPositions((const Square)square, subset);
                                return true;
                            });
