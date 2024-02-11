@@ -17,7 +17,7 @@ void Board::printStatus(std::ostream &os) const {
        << enPassant << "\t" << (castle[0] ? "K" : "") << (castle[2] ? "k" : "") << "\n";
 }
 
-template <bool side> [[nodiscard]] uint64_t Board::getKightMoves(const Square &square) const {
+template <bool side> [[nodiscard]] uint64_t Board::getKnightMoves(const Square &square) const {
     const uint64_t pieceBitboard = Utils::setSquare(square);
 
     constexpr uint64_t allyPieces;
@@ -52,28 +52,15 @@ template <bool side> [[nodiscard]] uint64_t Board::getKightMoves(const Square &s
 [[nodiscard]] uint64_t Board::getRookMoves(const Square &square) const {
     const uint64_t blockerPattern = rooks.getNaiveAttackPattern(square) & ~getEmptySquares();
 
-    std::shared_ptr<MagicValuesGeneratorInterface> valueGenerator =
-        std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator{});
-    const MagicBitboard magicBoard{valueGenerator};
-
-    std::vector<std::vector<uint64_t>> rookMoveTable;
-    rookMoveTable = magicBoard.magicGenerator->getTables(Rook::MAGIC_CONSTANTS, rooks);
-
     const uint64_t optimisedIndex = blockerPattern * Rook::MAGIC_CONSTANTS[square] >> Rook::SHIFT_VALUE;
-    return rookMoveTable[square][optimisedIndex];
+    return magicBitboard.rookMoveTable[square][optimisedIndex];
 }
 
 [[nodiscard]] uint64_t Board::getBishopMoves(const Square &square) const {
     const uint64_t blockerPattern = bishops.getNaiveAttackPattern(square) & ~getEmptySquares();
 
-    std::shared_ptr<MagicValuesGeneratorInterface> base = std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator{});
-    const MagicBitboard magicBoard{base};
-
-    std::vector<std::vector<uint64_t>> bishopMoveTable;
-    bishopMoveTable = magicBoard.magicGenerator->getTables(Bishop::MAGIC_CONSTANTS, bishops);
-
     const uint64_t optimisedIndex = blockerPattern * Bishop::MAGIC_CONSTANTS[square] >> Bishop::SHIFT_VALUE;
-    return bishopMoveTable[square][optimisedIndex];
+    return magicBitboard.bishopMoveTable[square][optimisedIndex];
 }
 
 template <bool side> [[nodiscard]] uint64_t Board::getPawnMoves(const Square &square) const {
@@ -118,25 +105,3 @@ template <bool side> [[nodiscard]] uint64_t Board::getKingMoves(const Square &sq
     return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown) &
            ~allyPieces;
 }
-//./build/main
-//               PANIC getTables
-//    8
-//    10294675697872762
-//    PANIC getTables
-//    25
-//    14460703742554276
-//    PANIC getTables
-//    26
-//    2858155501024063
-//    PANIC getTables
-//    34
-//    2415930761804470
-//    PANIC getTables
-//    40
-//    3051551835446002
-//    PANIC getTables
-//    43
-//    2762073245706157
-//    PANIC getTables
-//    50
-//    1909525105686087

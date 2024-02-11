@@ -5,7 +5,6 @@ build/
 main
 tempCodeRunnerFile.cpp
 *.yml
-*.txt
 
 # Prerequisites
 *.d
