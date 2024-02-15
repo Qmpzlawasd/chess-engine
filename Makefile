@@ -3,6 +3,7 @@ CFLAGS = -I $(SRC_DIR) -Wall -std=c++23 -pthread
 
 SRC_DIR = src
 BUILD_DIR = build
+TEST_DIR = tests
 
 TARGET = main
 
@@ -21,3 +22,10 @@ engine: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 
 run:
 	./$(BUILD_DIR)/$(TARGET)
+
+test:
+	cd $(TEST_DIR) && \
+	cmake -S . -B build 1> /dev/null && \
+	cmake --build build 1> /dev/null && \
+	cd build && ctest && \
+	cd ../../
