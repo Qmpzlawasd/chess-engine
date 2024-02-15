@@ -1,7 +1,3 @@
-//
-// Created by stefan on 25/01/24.
-//
-
 #ifndef CHESS_ENGINE_FEN_H
 #define CHESS_ENGINE_FEN_H
 
