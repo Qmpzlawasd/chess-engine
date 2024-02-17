@@ -72,6 +72,7 @@ class Rook : public SlidingPiece {
     [[nodiscard]] const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept override {
         return Rook::MAGIC_CONSTANTS;
     }
+    virtual ~Rook() = default;
 };
 
 class Bishop : public SlidingPiece {
@@ -102,6 +103,7 @@ class Bishop : public SlidingPiece {
     [[nodiscard]] const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept override {
         return Bishop::MAGIC_CONSTANTS;
     }
+    virtual ~Bishop() = default;
 };
 
 class Queen : public SlidingPiece {
@@ -116,6 +118,7 @@ class Queen : public SlidingPiece {
     [[nodiscard]] const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept override {
         return Rook::MAGIC_CONSTANTS;
     }
+    virtual ~Queen() = default;
 };
 
 #endif // CHESS_ENGINE_PIECE_H
