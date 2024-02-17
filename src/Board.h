@@ -1,6 +1,14 @@
 #ifndef CHESS_ENGINE_BOARD_H
 #define CHESS_ENGINE_BOARD_H
 
+#include <bitset>
+#include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <thread>
+#include <unordered_map>
+#include <vector>
+
 #include "Board.h"
 #include "FEN.h"
 #include "MagicBitboard.h"
@@ -9,13 +17,6 @@
 #include "Piece.h"
 #include "Squares.h"
 #include "Utils.h"
-#include <bitset>
-#include <cstdint>
-#include <fstream>
-#include <iostream>
-#include <thread>
-#include <unordered_map>
-#include <vector>
 
 class Board {
   public:
@@ -58,6 +59,56 @@ class Board {
           halfmoveClock{FEN::parseHalfmoveClock(fen)}, fullmoveNumber{FEN::parseFullmoveNumber(fen)} {};
 
     ~Board() = default;
+
+    template <bool side> [[nodiscard]] bool bishopAttacksSquare(const Square &square) const {
+
+        uint64_t enemyBishops;
+        if constexpr (side == Utils::WHITE) {
+            enemyBishops = bishops.getBlack();
+        } else {
+            enemyBishops = bishops.getWhite();
+        }
+
+        const uint64_t originBishopAttack = this->getBishopMoves<side>(square);
+        Utils::showBitBoard(originBishopAttack);
+        return originBishopAttack & enemyBishops;
+    }
+
+    template <bool side> [[nodiscard]] bool pawnAttacksSquare(const Square &square) const {
+        uint64_t enemyPawns;
+        if constexpr (side == Utils::WHITE) {
+            enemyPawns = pawns.getBlack();
+        } else {
+            enemyPawns = pawns.getWhite();
+        }
+
+        const uint64_t originPawnAttack = this->getPawnMoves<side>(square);
+        return originPawnAttack & enemyPawns;
+    }
+
+    template <bool side> [[nodiscard]] bool kingAttacksSquare(const Square &square) const {
+        uint64_t enemyKing;
+        if constexpr (side == Utils::WHITE) {
+            enemyKing = king.getBlack();
+        } else {
+            enemyKing = king.getWhite();
+        }
+
+        const uint64_t originKingAttack = this->getKingMoves<side>(square);
+        return originKingAttack & enemyKing;
+    }
+
+    template <bool side> [[nodiscard]] bool rookAttacksSquare(const Square &square) const {
+        uint64_t enemyRooks;
+        if constexpr (side == Utils::WHITE) {
+            enemyRooks = rooks.getBlack();
+        } else {
+            enemyRooks = rooks.getWhite();
+        }
+
+        const uint64_t originRookAttack = this->getRookMoves<side>(square);
+        return originRookAttack & enemyRooks;
+    }
 
     template <bool side> [[nodiscard]] uint64_t getKnightMoves(const Square &square) const {
         const uint64_t pieceBitboard = Utils::setSquare(square);
@@ -107,6 +158,7 @@ class Board {
 
     template <bool side> [[nodiscard]] uint64_t getBishopMoves(const Square &square) const {
         const uint64_t blockerPattern = bishops.getNaiveAttackPattern(square) & ~getEmptySquares();
+        Utils::showBitBoard(blockerPattern);
         uint64_t allyPieces;
         if constexpr (side == Utils::WHITE)
             allyPieces = this->getFullWhiteSquares();
@@ -118,7 +170,6 @@ class Board {
     }
 
     template <bool side> [[nodiscard]] uint64_t getPawnMoves(const Square &square) const {
-
         const uint64_t pieceBitboard = Utils::setSquare(square);
 
         uint64_t forwardMove, attackLeft, attackRight;
