@@ -1,0 +1,6 @@
+#ifndef CHESS_ENGINE_COLORS_H
+#define CHESS_ENGINE_COLORS_H
+
+enum Color { WHITE, BLACK };
+
+#endif // CHESS_ENGINE_COLORS_H

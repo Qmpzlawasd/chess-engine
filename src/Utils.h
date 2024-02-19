@@ -12,9 +12,6 @@ class Utils {
     static void showReversedBin(int8_t nr);
 
   public:
-    static constexpr bool WHITE = true;
-    static constexpr bool BLACK = false;
-
     static constexpr uint8_t ROW_NUMBER = 8;
     static constexpr uint8_t COLUMN_NUMBER = 8;
 

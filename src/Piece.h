@@ -6,15 +6,16 @@
 #include <array>
 
 class Piece {
-    uint64_t white;
+  protected:
+    uint64_t whitePieces;
     uint64_t black;
 
   public:
-    Piece() : white{0}, black{0} {};
+    Piece() : whitePieces{0}, black{0} {};
 
-    Piece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : white{whiteConfiguration}, black{blackConfiguration} {};
+    Piece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : whitePieces{whiteConfiguration}, black{blackConfiguration} {};
 
-    [[nodiscard]] uint64_t getWhite() const { return white; }
+    [[nodiscard]] uint64_t getWhite() const { return whitePieces; }
 
     [[nodiscard]] uint64_t getBlack() const { return black; }
 };
