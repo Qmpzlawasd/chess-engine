@@ -3,6 +3,7 @@
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
 #include "MagicValuesParallelGenerator.h"
+#include "Piece/SlidingPiece.h"
 #include <memory>
 
 class MagicBitboard {

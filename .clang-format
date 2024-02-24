@@ -1,6 +1,6 @@
 IndentWidth:     4
 ColumnLimit:     140
-AlignConsecutiveMacros: true
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
 
 AlignArrayOfStructures: Left
 
@@ -9,3 +9,5 @@ BinPackArguments: false
 BinPackParameters: false
 
 BreakStringLiterals: false
+
+AlwaysBreakTemplateDeclarations: Yes

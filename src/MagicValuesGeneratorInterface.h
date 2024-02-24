@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Piece.h"
+#include "Piece/Piece.h"
+#include "Piece/SlidingPiece.h"
 #include <bitset>
 #include <thread>
 #include <vector>

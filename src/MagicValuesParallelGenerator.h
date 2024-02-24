@@ -2,7 +2,8 @@
 
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
-#include "Piece.h"
+#include "Piece/Piece.h"
+#include "Piece/SlidingPiece.h"
 #include "Squares.h"
 #include <array>
 #include <bitset>
@@ -81,9 +82,9 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
             tryMagicNumber(magicValues[square],
                            Square(square),
                            slidingPiece,
-                           [&tableSize, &bitboard, &square, &slidingPiece](const uint64_t &key, const uint64_t &subset) -> bool {
+                           [&bitboard, &square, &slidingPiece](const uint64_t &key, const uint64_t &subset) -> bool {
                                assert(bitboard[square][key] == (uint64_t)-1);
-                               bitboard[square][key] = slidingPiece.fillPositions((const Square)square, subset);
+                               bitboard[square][key] = slidingPiece.getBlockedAttackPattern((const Square)square, subset);
                                return true;
                            });
         }

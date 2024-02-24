@@ -1,50 +1,18 @@
-#ifndef CHESS_ENGINE_PIECE_H
-#define CHESS_ENGINE_PIECE_H
+#ifndef CHESS_ENGINE_SLIDINGPIECE_H
+#define CHESS_ENGINE_SLIDINGPIECE_H
 
-#include "Squares.h"
-#include "Utils.h"
-#include <array>
-
-class Piece {
-  protected:
-    uint64_t whitePieces;
-    uint64_t black;
-
-  public:
-    Piece() : whitePieces{0}, black{0} {};
-
-    Piece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : whitePieces{whiteConfiguration}, black{blackConfiguration} {};
-
-    [[nodiscard]] uint64_t getWhite() const { return whitePieces; }
-
-    [[nodiscard]] uint64_t getBlack() const { return black; }
-};
-
-class Pawn : public Piece {
-  public:
-    Pawn(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece{whiteConfiguration, blackConfiguration} {};
-};
-
-class King : public Piece {
-  public:
-    King(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece{whiteConfiguration, blackConfiguration} {};
-};
-
-class Knight : public Piece {
-  public:
-    Knight(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece{whiteConfiguration, blackConfiguration} {};
-};
-
+#include "../Squares.h"
+#include "../Utils.h"
+#include "Piece.h"
+#include <cstdint>
 class SlidingPiece : public Piece {
   public:
-    SlidingPiece() : Piece(){};
-
     SlidingPiece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece(whiteConfiguration, blackConfiguration){};
 
+    [[nodiscard]] virtual uint64_t getBlockedAttackPattern(const Square &, const uint64_t &) const noexcept = 0;
     [[nodiscard]] virtual uint8_t getShiftValue() const noexcept = 0;
-    [[nodiscard]] virtual uint64_t getNaiveAttackPattern(const Square &square) const noexcept = 0;
-    [[nodiscard]] virtual uint64_t fillPositions(const Square &, const uint64_t &) const noexcept = 0;
     [[nodiscard]] virtual const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept = 0;
+    [[nodiscard]] virtual uint64_t getNaiveAttackPattern(const Square &) const noexcept = 0;
 };
 
 class Rook : public SlidingPiece {
@@ -63,17 +31,18 @@ class Rook : public SlidingPiece {
         19470701407538,
     };
 
-    Rook() : SlidingPiece{} {};
-
-    Rook(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : SlidingPiece{whiteConfiguration, blackConfiguration} {};
+    Rook(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : SlidingPiece(whiteConfiguration, blackConfiguration){};
+    Rook() : SlidingPiece(0, 0){};
+    virtual ~Rook() = default;
 
     [[nodiscard]] uint64_t getNaiveAttackPattern(const Square &square) const noexcept override;
-    [[nodiscard]] uint64_t fillPositions(const Square &square, const uint64_t &pattern) const noexcept override;
+    [[nodiscard]] uint64_t getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept override;
     [[nodiscard]] uint8_t getShiftValue() const noexcept override { return Rook::SHIFT_VALUE; }
     [[nodiscard]] const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept override {
         return Rook::MAGIC_CONSTANTS;
     }
-    virtual ~Rook() = default;
+
+    [[nodiscard]] static uint64_t getMoves(const Square &square, const uint64_t &emptySquares) noexcept;
 };
 
 class Bishop : public SlidingPiece {
@@ -92,34 +61,35 @@ class Bishop : public SlidingPiece {
         636508561067425083, 636508561067425083, 636508561067425083, 636508561067425083,  636508561067425083, 636508561067425083,
         636508561067425083, 636508561067425083, 636508561067425083, 636508561067425083,
     };
-    Bishop() : SlidingPiece{} {};
+    Bishop(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : SlidingPiece(whiteConfiguration, blackConfiguration){};
+    Bishop() : SlidingPiece{0, 0} {};
+    virtual ~Bishop() = default;
 
-    Bishop(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration)
-        : SlidingPiece{whiteConfiguration, blackConfiguration} {};
 
     [[nodiscard]] uint64_t getNaiveAttackPattern(const Square &square) const noexcept override;
-
-    [[nodiscard]] uint64_t fillPositions(const Square &square, const uint64_t &pattern) const noexcept override;
+    [[nodiscard]] uint64_t getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept override;
     [[nodiscard]] uint8_t getShiftValue() const noexcept override { return Bishop::SHIFT_VALUE; }
     [[nodiscard]] const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept override {
         return Bishop::MAGIC_CONSTANTS;
     }
-    virtual ~Bishop() = default;
+
+    [[nodiscard]] static uint64_t getMoves(const Square &square, const uint64_t &emptySquares) noexcept;
 };
 
 class Queen : public SlidingPiece {
   public:
-    Queen() : SlidingPiece{} {};
-
-    Queen(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : SlidingPiece{whiteConfiguration, blackConfiguration} {};
+    Queen() : SlidingPiece(0, 0){};
+    Queen(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : SlidingPiece(whiteConfiguration, blackConfiguration){};
+    virtual ~Queen() = default;
 
     [[nodiscard]] uint64_t getNaiveAttackPattern(const Square &square) const noexcept override;
-    [[nodiscard]] uint64_t fillPositions(const Square &square, const uint64_t &pattern) const noexcept override;
+    [[nodiscard]] uint64_t getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept override;
     [[nodiscard]] uint8_t getShiftValue() const noexcept override { return Rook::SHIFT_VALUE; }
     [[nodiscard]] const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept override {
         return Rook::MAGIC_CONSTANTS;
     }
-    virtual ~Queen() = default;
+
+    [[nodiscard]] static uint64_t getMoves(const Square &square, const uint64_t &emptySquares) noexcept;
 };
 
-#endif // CHESS_ENGINE_PIECE_H
+#endif // CHESS_ENGINE_SLIDINGPIECE_H

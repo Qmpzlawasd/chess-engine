@@ -1,4 +1,5 @@
-#include "Piece.h"
+#include "SlidingPiece.h"
+#include "../MagicBitboard.h"
 
 uint64_t Rook::getNaiveAttackPattern(const Square &square) const noexcept {
     const uint8_t line = square % Utils::ROW_NUMBER;
@@ -10,65 +11,13 @@ uint64_t Rook::getNaiveAttackPattern(const Square &square) const noexcept {
     return (PIECE_FILE | PIECE_ROW) & ~Utils::setSquare(square);
 }
 
-uint64_t Bishop::getNaiveAttackPattern(const Square &square) const noexcept {
-    const uint8_t column = square % Utils::ROW_NUMBER;
-    const uint8_t line = square / Utils::COLUMN_NUMBER;
-
-    uint64_t naiveAttackPattern = 0;
-
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j++) {
-        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-    }
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j--) {
-        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-    }
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j++) {
-        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-    }
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j--) {
-        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-    }
-    return naiveAttackPattern & ~Utils::setSquare(square);
+uint64_t Rook::getMoves(const Square &square, const uint64_t &emptySquares) noexcept {
+    const uint64_t blockerPattern = Rook{}.getNaiveAttackPattern(square) & ~emptySquares;
+    const uint64_t optimisedIndex = blockerPattern * Rook::MAGIC_CONSTANTS[square] >> Rook::SHIFT_VALUE;
+    return magicBitboard.rookMoveTable[square][optimisedIndex];
 }
 
-uint64_t Bishop::fillPositions(const Square &square, const uint64_t &pattern) const noexcept {
-    const uint8_t column = square % Utils::ROW_NUMBER;
-    const uint8_t line = square / Utils::COLUMN_NUMBER;
-
-    uint64_t filledPattern = 0;
-
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j++) {
-        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-        filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
-            break;
-        }
-    }
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j--) {
-        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-        filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
-            break;
-        }
-    }
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j++) {
-        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-        filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
-            break;
-        }
-    }
-    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j--) {
-        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
-        filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
-            break;
-        }
-    }
-    return filledPattern & ~Utils::setSquare(square);
-}
-
-uint64_t Rook::fillPositions(const Square &square, const uint64_t &pattern) const noexcept {
+uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
     const uint8_t line = square / Utils::COLUMN_NUMBER;
 
@@ -109,9 +58,78 @@ uint64_t Rook::fillPositions(const Square &square, const uint64_t &pattern) cons
     return filledPattern;
 }
 
-uint64_t Queen::fillPositions(const Square &square, const uint64_t &pattern) const noexcept {
-    return Rook{}.fillPositions(square, pattern) | Bishop{}.fillPositions(square, pattern);
+uint64_t Bishop::getNaiveAttackPattern(const Square &square) const noexcept {
+    const uint8_t column = square % Utils::ROW_NUMBER;
+    const uint8_t line = square / Utils::COLUMN_NUMBER;
+
+    uint64_t naiveAttackPattern = 0;
+
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j++) {
+        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+    }
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j--) {
+        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+    }
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j++) {
+        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+    }
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j--) {
+        naiveAttackPattern |= Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+    }
+    return naiveAttackPattern & ~Utils::setSquare(square);
 }
+
+uint64_t Bishop::getMoves(const Square &square, const uint64_t &emptySquares) noexcept {
+    const uint64_t blockerPattern = Bishop{}.getNaiveAttackPattern(square) & ~emptySquares;
+    const uint64_t optimisedIndex = blockerPattern * Bishop::MAGIC_CONSTANTS[square] >> Bishop::SHIFT_VALUE;
+    return magicBitboard.bishopMoveTable[square][optimisedIndex];
+}
+
+uint64_t Bishop::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
+    const uint8_t column = square % Utils::ROW_NUMBER;
+    const uint8_t line = square / Utils::COLUMN_NUMBER;
+
+    uint64_t filledPattern = 0;
+
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j++) {
+        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+        filledPattern |= nextSquareSet;
+        if ((nextSquareSet & pattern) != 0) {
+            break;
+        }
+    }
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j--) {
+        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+        filledPattern |= nextSquareSet;
+        if ((nextSquareSet & pattern) != 0) {
+            break;
+        }
+    }
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j++) {
+        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+        filledPattern |= nextSquareSet;
+        if ((nextSquareSet & pattern) != 0) {
+            break;
+        }
+    }
+    for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j--) {
+        uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
+        filledPattern |= nextSquareSet;
+        if ((nextSquareSet & pattern) != 0) {
+            break;
+        }
+    }
+    return filledPattern & ~Utils::setSquare(square);
+}
+
 uint64_t Queen::getNaiveAttackPattern(const Square &square) const noexcept {
     return Rook{}.getNaiveAttackPattern(square) | Bishop{}.getNaiveAttackPattern(square);
+}
+
+uint64_t Queen::getMoves(const Square &square, const uint64_t &emptySquares) noexcept {
+    return Rook::getMoves(square, emptySquares) | Bishop::getMoves(square, emptySquares);
+}
+
+uint64_t Queen::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
+    return Rook{}.getBlockedAttackPattern(square, pattern) | Bishop{}.getBlockedAttackPattern(square, pattern);
 }
