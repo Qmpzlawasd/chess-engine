@@ -9,10 +9,10 @@ class SlidingPiece : public Piece {
   public:
     SlidingPiece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece(whiteConfiguration, blackConfiguration){};
 
-    [[nodiscard]] virtual uint64_t getBlockedAttackPattern(const Square &, const uint64_t &) const noexcept = 0;
     [[nodiscard]] virtual uint8_t getShiftValue() const noexcept = 0;
-    [[nodiscard]] virtual const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept = 0;
     [[nodiscard]] virtual uint64_t getNaiveAttackPattern(const Square &) const noexcept = 0;
+    [[nodiscard]] virtual uint64_t getBlockedAttackPattern(const Square &, const uint64_t &) const noexcept = 0;
+    [[nodiscard]] virtual const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept = 0;
 };
 
 class Rook : public SlidingPiece {
@@ -64,7 +64,6 @@ class Bishop : public SlidingPiece {
     Bishop(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : SlidingPiece(whiteConfiguration, blackConfiguration){};
     Bishop() : SlidingPiece{0, 0} {};
     virtual ~Bishop() = default;
-
 
     [[nodiscard]] uint64_t getNaiveAttackPattern(const Square &square) const noexcept override;
     [[nodiscard]] uint64_t getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept override;

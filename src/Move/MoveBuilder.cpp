@@ -1,8 +1,6 @@
-//
-// Created by stefan on 15/02/24.
-//
-
+#include "MoveBuilder.h"
 #include "Move.h"
+
 MoveBuilder &MoveBuilder::toSquare(const Square &toSquare) {
     move.setToSquare(toSquare);
     return *this;
@@ -21,23 +19,33 @@ MoveBuilder &MoveBuilder::withCapture() {
 }
 Move MoveBuilder::withDoublePawnPush() {
     move.setDoublePawnPush();
-    return move;
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 Move MoveBuilder::withKingSideCastle() {
     move.setKingSideCastle();
-    return move;
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 Move MoveBuilder::withQueenSideCastle() {
     move.setQueenSideCastle();
-    return move;
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 Move MoveBuilder::withEnPassantCapture() {
     move.setEnPassantCapture();
-    return move ;
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 Move MoveBuilder::withEnPassant() {
     move.setEnPassant();
-    return move;
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 MoveBuilder &MoveBuilder::withKnight() {
     move.setWithKnight();
@@ -55,4 +63,8 @@ MoveBuilder &MoveBuilder::withQueen() {
     move.setWithQueen();
     return *this;
 }
-Move MoveBuilder::getMove() { return move; }
+Move MoveBuilder::getMove() {
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
+}

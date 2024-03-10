@@ -65,3 +65,4 @@ enum Square {
     G8,
     H8,
 };
+

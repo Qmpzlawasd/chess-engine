@@ -58,6 +58,29 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     return filledPattern;
 }
 
+//uint64_t Rook::getBlockedAttackPattern(const uint64_t &pieces, const uint64_t &pattern) const noexcept {
+//    puts("DO NOT USE getBlockedAttackPattern");
+//    constexpr uint64_t borderBitBoard = Utils::A_FILE | Utils::H_FILE;
+//    uint64_t attackPiecesVertical = pieces;
+//    uint64_t attackPiecesHorizontal = pieces;
+//    for (int i = 0; i < Utils::COLUMN_NUMBER; ++i) {
+//        attackPiecesHorizontal |= (attackPiecesHorizontal >> (Utils::ROW_NUMBER)) & ~pattern;
+//    }
+//    for (int i = 0; i < Utils::COLUMN_NUMBER; ++i) {
+//        attackPiecesHorizontal |= (attackPiecesHorizontal << (Utils::ROW_NUMBER)) & ~pattern;
+//    }
+//
+//    for (int i = 0; i < Utils::ROW_NUMBER; ++i) {
+//        attackPiecesVertical |= (attackPiecesVertical >> 1) & (~pattern & ~borderBitBoard);
+//    }
+//    attackPiecesVertical |= (attackPiecesVertical >> 1) & ~pattern;
+//    for (int i = 0; i < Utils::ROW_NUMBER; ++i) {
+//        attackPiecesVertical |= (attackPiecesVertical << 1) & (~pattern & ~borderBitBoard);
+//    }
+//    attackPiecesVertical |= (attackPiecesVertical << 1) & ~pattern;
+//    return (attackPiecesHorizontal | attackPiecesVertical) & ~pieces;
+//}
+
 uint64_t Bishop::getNaiveAttackPattern(const Square &square) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
     const uint8_t line = square / Utils::COLUMN_NUMBER;
