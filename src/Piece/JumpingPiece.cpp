@@ -15,7 +15,7 @@
     const uint64_t attackRightUp = (pieceBitboard & ~Utils::H_FILE) << (Utils::ROW_NUMBER + 1);
     const uint64_t attackRightDown = (pieceBitboard & ~Utils::H_FILE) >> (Utils::ROW_NUMBER - 1);
 
-    return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown) &;
+    return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown) ;
 }
 
 [[nodiscard]] uint64_t Knight::getMoves(const Square &square) noexcept {

@@ -15,6 +15,7 @@
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
 #include "MagicValuesParallelGenerator.h"
+#include "Move/MoveBuilder.h"
 #include "Piece/JumpingPiece.h"
 #include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
@@ -54,35 +55,67 @@ class Board {
     void printStatus(std::ostream &os) const;
 
     template <Color side>
-    [[nodiscard]] bool bishopAttacksSquare(const Square &square) const {
-        uint64_t enemyBishops, enemyQueen;
+    [[nodiscard]] uint64_t bishopAttacksSquare(const Square &square) const {
+        uint64_t enemyBishops;
         if constexpr (side == WHITE) {
             enemyBishops = bishops.getBlack();
-            enemyQueen = queens.getBlack();
         } else {
             enemyBishops = bishops.getWhite();
-            enemyQueen = queens.getWhite();
         }
 
         const uint64_t originBishopAttack = Bishop::getMoves(square, getEmptySquares());
-        return (originBishopAttack & enemyBishops) | (originBishopAttack & enemyQueen);
+        return originBishopAttack & enemyBishops;
     }
 
+     std::vector<Move> getMovesFromBitboard(const Square &pieceSquare, uint64_t bitboard) {
+        MoveBuilder moveBuilder;
+        std::vector<Move> generatedMoves;
+        while (bitboard){
+            const Square to =  Utils::popLSB(bitboard);
+//            Utils::showBitBoard(Utils::setSquare(to));
+            generatedMoves.push_back(moveBuilder.fromSquare(pieceSquare).toSquare(to).getMove());
+        }
+        return generatedMoves;
+    }
+
+    //    template <Color side>
+    //    [[nodiscard]] uint64_t getPinnedAlliedPieces() const noexcept {
+    //
+    //
+    //    }
+
+    //    template <Color side>
+    //    [[nodiscard]] uint64_t getPinnedSquares() const {
+    //        uint64_t rooksRays, bishopsRays;
+    //        uint64_t kingAsRookRay, kingAsBishopRay;
+    //        if constexpr (side == WHITE) {
+    //            rooksRays = rooks.getBlockedAttackPattern(rooks.getBlack(), ~getEmptySquares());
+    //            kingAsRookRay = rooks.getBlockedAttackPattern(king.getWhite(), ~getEmptySquares());
+    //            bishopsRays = bishops.getBlockedAttackPattern(Square(bishops.getBlack()), ~getEmptySquares());
+    //            kingAsBishopRay = bishops.getBlockedAttackPattern(Square(king.getBlack()), ~getEmptySquares());
+    //        } else {
+    //            rooksRays = rooks.getBlockedAttackPattern(rooks.getWhite(), ~getEmptySquares());
+    //            kingAsRookRay = rooks.getBlockedAttackPattern(king.getBlack(), ~getEmptySquares());
+    //            bishopsRays = bishops.getBlockedAttackPattern(Square(bishops.getWhite()), ~getEmptySquares());
+    //            kingAsBishopRay = bishops.getBlockedAttackPattern(Square(king.getWhite()), ~getEmptySquares());
+    //        }
+    //        return (rooksRays & kingAsRookRay);
+    //    }
     template <Color side>
-    [[nodiscard]] bool knightAttacksSquare(const Square &square) const {
-        uint64_t enemyKing;
+    [[nodiscard]] uint64_t knightAttacksSquare(const Square &square) const {
+        uint64_t enemyKnight;
         if constexpr (side == WHITE) {
-            enemyKing = king.getBlack();
+            enemyKnight = knights.getBlack();
         } else {
-            enemyKing = king.getWhite();
+            enemyKnight = knights.getWhite();
         }
 
         const uint64_t originKingAttack = Knight::getMoves(square);
-        return originKingAttack & enemyKing;
+        return originKingAttack & enemyKnight;
     }
 
     template <Color side>
-    [[nodiscard]] bool kingAttacksSquare(const Square &square) const {
+    [[nodiscard]] uint64_t kingAttacksSquare(const Square &square) const {
         uint64_t enemyKing;
         if constexpr (side == WHITE) {
             enemyKing = king.getBlack();
@@ -95,7 +128,7 @@ class Board {
     }
 
     template <Color side>
-    [[nodiscard]] bool pawnAttacksSquare(const Square &square) const {
+    [[nodiscard]] uint64_t pawnAttacksSquare(const Square &square) const {
         uint64_t enemyPawns;
         if constexpr (side == WHITE) {
             enemyPawns = pawns.getBlack();
@@ -103,23 +136,33 @@ class Board {
             enemyPawns = pawns.getWhite();
         }
 
-        const uint64_t originPawnAttack = Pawn::getMoves<side>(square);
+        const uint64_t originPawnAttack = Pawn::getAttacks<side>(square);
         return originPawnAttack & enemyPawns;
     }
 
     template <Color side>
-    [[nodiscard]] bool rookAttacksSquare(const Square &square) const {
-        uint64_t enemyRooks, enemyQueen;
+    [[nodiscard]] uint64_t rookAttacksSquare(const Square &square) const {
+        uint64_t enemyRooks;
         if constexpr (side == WHITE) {
             enemyRooks = rooks.getBlack();
-            enemyQueen = queens.getBlack();
         } else {
             enemyRooks = rooks.getWhite();
-            enemyQueen = queens.getWhite();
         }
 
         const uint64_t originRookAttack = Rook::getMoves(square, getEmptySquares());
-        return (originRookAttack & enemyRooks) | (originRookAttack & enemyQueen);
+        return originRookAttack & enemyRooks;
+    }
+    template <Color side>
+    [[nodiscard]] uint64_t queenAttacksSquare(const Square &square) const {
+        uint64_t enemyQueen;
+        if constexpr (side == WHITE) {
+            enemyQueen = queens.getBlack();
+        } else {
+            enemyQueen = queens.getWhite();
+        }
+
+        const uint64_t originQueenAttack = Rook::getMoves(square, getEmptySquares()) | Bishop::getMoves(square, getEmptySquares());
+        return originQueenAttack & enemyQueen;
     }
 
   public:
@@ -133,9 +176,9 @@ class Board {
     ~Board() = default;
 
     template <Color side>
-    [[nodiscard]] bool isSquareAttacked(const Square &square) const {
-        return rookAttacksSquare<side>(square) || bishopAttacksSquare<side>(square) || pawnAttacksSquare<side>(square) ||
-               kingAttacksSquare<side>(square);
+    [[nodiscard]] uint64_t isSquareAttacked(const Square &square) const {
+        return rookAttacksSquare<side>(square) | bishopAttacksSquare<side>(square) | pawnAttacksSquare<side>(square) |
+               kingAttacksSquare<side>(square) | queenAttacksSquare<side>(square) | knightAttacksSquare<side>(square);
     }
 
     friend std::ostream &operator<<(std::ostream &os, const Board &board) {

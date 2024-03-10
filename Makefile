@@ -8,7 +8,7 @@ TEST_DIR = tests
 TARGET = main
 
 ENGINE_DEPS = $(wildcard $(SRC_DIR)/*.h)
-ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp)
 
 .PHONY: pre-build all engine
 
@@ -22,10 +22,3 @@ engine: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 
 run:
 	./$(BUILD_DIR)/$(TARGET)
-
-test:
-	cd $(TEST_DIR) && \
-	cmake -S . -B build 1> /dev/null && \
-	cmake --build build 1> /dev/null && \
-	cd build && ctest && \
-	cd ../../

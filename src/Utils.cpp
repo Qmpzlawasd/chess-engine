@@ -7,6 +7,8 @@ void Utils::showReversedBin(int8_t nr) {
     std::cout << "\n";
 }
 
+void Utils::showBitBoard(const Square &square) { showBitBoard(Utils::setSquare(square)); }
+
 void Utils::showBitBoard(const uint64_t &board) {
     for (int8_t i = ROW_NUMBER - 1; i >= 0; i--) {
         showReversedBin((board >> (i * ROW_NUMBER)) & ((unsigned int)(1 << ROW_NUMBER) - 1));

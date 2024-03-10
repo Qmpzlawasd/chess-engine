@@ -33,7 +33,9 @@ class Pawn : public SpecialPiece {
     Pawn() : SpecialPiece(0, 0){};
 
     template <Color side>
-    [[nodiscard]]  static uint64_t getMoves(const Square &) noexcept;
+    [[nodiscard]] static uint64_t getMoves(const Square &, const uint64_t &) noexcept;
+    template <Color side>
+    [[nodiscard]] static uint64_t getAttacks(const Square &) noexcept;
 };
 
 #endif // CHESS_ENGINE_PIECE_H
