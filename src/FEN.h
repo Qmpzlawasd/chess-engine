@@ -1,8 +1,8 @@
 #ifndef CHESS_ENGINE_FEN_H
 #define CHESS_ENGINE_FEN_H
 
-#include "Squares.h"
-#include <bitset>
+#include "Colors.h"
+#include "Castle.h"
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -11,15 +11,16 @@ class FEN {
   public:
     explicit FEN() = default;
 
-    static bool parseTurn(const std::string &fen);
+    static Color parseTurn(const std::string &);
 
-    static std::bitset<4> parseCastle(const std::string &fen);
+    template <Color side>
+    static Castle<side> parseCastle(const std::string &);
 
-    static uint64_t parseEnPassant(const std::string &fen);
+    static uint64_t parseEnPassant(const std::string &);
 
-    static uint8_t parseHalfmoveClock(const std::string &fen);
+    static uint8_t parseHalfmoveClock(const std::string &);
 
-    static uint16_t parseFullmoveNumber(const std::string &fen);
+    static uint16_t parseFullmoveNumber(const std::string &);
 
     /**
      * Parse a FEN string
@@ -28,7 +29,7 @@ class FEN {
      * @param[in] value target piece (Ex. "k", "K", "Q", "q" etc.)
      * @return bitboard
      */
-    static uint64_t parsePiece(const std::string &fen, const char &piece);
+    static uint64_t parsePiece(const std::string &, const char &);
 };
 
 #endif // CHESS_ENGINE_FEN_H

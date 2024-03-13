@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
-#include <bitset>
-#include <thread>
 #include <vector>
 
 class MagicValuesGeneratorInterface {

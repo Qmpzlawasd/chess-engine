@@ -1,4 +1,4 @@
-#include "Piece.h"
+#include "SpecialPiece.h"
 
 template <Color side>
 [[nodiscard]] uint64_t Pawn::getMoves(const Square &square, const uint64_t &emptySquares) noexcept {
@@ -18,7 +18,7 @@ template uint64_t Pawn::getMoves<BLACK>(const Square &, const uint64_t &) noexce
 template uint64_t Pawn::getMoves<WHITE>(const Square &, const uint64_t &) noexcept;
 
 template <Color side>
-uint64_t Pawn::getAttacks(const Square &square) noexcept {
+uint64_t Pawn::getThreatens(const Square &square) noexcept {
     const uint64_t pieceBitboard = Utils::setSquare(square);
 
     uint64_t attackLeft, attackRight;
@@ -34,5 +34,5 @@ uint64_t Pawn::getAttacks(const Square &square) noexcept {
     return attackLeft | attackRight;
 }
 
-template uint64_t Pawn::getAttacks<WHITE>(const Square &) noexcept;
-template uint64_t Pawn::getAttacks<BLACK>(const Square &) noexcept;
+template uint64_t Pawn::getThreatens<WHITE>(const Square &square) noexcept;
+template uint64_t Pawn::getThreatens<BLACK>(const Square &square) noexcept;

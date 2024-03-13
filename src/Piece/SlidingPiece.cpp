@@ -17,6 +17,12 @@ uint64_t Rook::getMoves(const Square &square, const uint64_t &emptySquares) noex
     return magicBitboard.rookMoveTable[square][optimisedIndex];
 }
 
+uint64_t Rook::getThreatens(const Square &square, const uint64_t &allyPieces) noexcept {
+    const uint64_t blockerPattern = Rook{}.getNaiveAttackPattern(square) & allyPieces;
+    const uint64_t optimisedIndex = blockerPattern * Rook::MAGIC_CONSTANTS[square] >> Rook::SHIFT_VALUE;
+    return magicBitboard.rookMoveTable[square][optimisedIndex];
+}
+
 uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
     const uint8_t line = square / Utils::COLUMN_NUMBER;
@@ -108,6 +114,12 @@ uint64_t Bishop::getMoves(const Square &square, const uint64_t &emptySquares) no
     return magicBitboard.bishopMoveTable[square][optimisedIndex];
 }
 
+uint64_t Bishop::getThreatens(const Square &square, const uint64_t &allyPieces) noexcept {
+    const uint64_t blockerPattern = Bishop{}.getNaiveAttackPattern(square) & allyPieces;
+    const uint64_t optimisedIndex = blockerPattern * Bishop::MAGIC_CONSTANTS[square] >> Bishop::SHIFT_VALUE;
+    return magicBitboard.bishopMoveTable[square][optimisedIndex];
+}
+
 uint64_t Bishop::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
     const uint8_t line = square / Utils::COLUMN_NUMBER;
@@ -153,6 +165,11 @@ uint64_t Queen::getMoves(const Square &square, const uint64_t &emptySquares) noe
     return Rook::getMoves(square, emptySquares) | Bishop::getMoves(square, emptySquares);
 }
 
+uint64_t Queen::getThreatens(const Square &square, const uint64_t &allyPieces) noexcept {
+    return Rook::getThreatens(square, allyPieces) | Bishop::getThreatens(square, allyPieces);
+}
+
 uint64_t Queen::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
     return Rook{}.getBlockedAttackPattern(square, pattern) | Bishop{}.getBlockedAttackPattern(square, pattern);
 }
+

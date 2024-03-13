@@ -3,6 +3,7 @@
 
 #include "Squares.h"
 #include <bitset>
+#include <functional>
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -20,6 +21,7 @@ class Utils {
     static constexpr uint64_t A_FILE = 0x0101010101010101;
     static constexpr uint64_t H_FILE = 0x8080808080808080;
     static constexpr uint64_t FIRST_ROW = 0x00000000000000ff;
+    static constexpr uint64_t LAST_ROW = 0xff00000000000000;
 
     static constexpr uint64_t BIT_SQUARE_LOOKUP_MAGIC = 0x03f79d71b4cb0a89;
 
@@ -37,6 +39,13 @@ class Utils {
         const Square poppedBit = Utils::bitToSquare(board);
         board &= board - 1;
         return poppedBit;
+    }
+
+    static void runForEachSetBit(uint64_t bitboard, const std::function<void(const Square &)> &callEachBit) {
+        while (bitboard) {
+            const Square setSquare = Utils::popLSB(bitboard);
+            callEachBit(setSquare);
+        }
     }
 
     static void showBitBoard(const uint64_t &);

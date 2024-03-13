@@ -1,24 +1,31 @@
 #include "FEN.h"
+#include "Castle.h"
+#include "Colors.h"
 #include "Utils.h"
 
-bool FEN::FEN::parseTurn(const std::string &fen) {
+Color FEN::parseTurn(const std::string &fen) {
     size_t firstSpace = fen.find(' ');
-    return fen[firstSpace + 1] == 'w';
+    if (fen[firstSpace + 1] == 'w') {
+        return WHITE;
+    }
+    return BLACK;
 }
 
-std::bitset<4> FEN::parseCastle(const std::string &fen) {
+template <Color side>
+Castle<side> FEN::parseCastle(const std::string &fen) {
     size_t firstSpace = fen.find(' ');
     size_t secondSpace = fen.find(' ', firstSpace + 1);
     size_t thirdSpace = fen.find(' ', secondSpace + 1);
     std::string cat = fen.substr(secondSpace + 1, thirdSpace - secondSpace - 1);
-
-    std::bitset<4> asd;
-    asd = ((1 << 0) * (cat.find('K') != std::string::npos ? 1 : 0)) |
-          ((1 << 1) * (cat.find('Q') != std::string::npos ? 1 : 0)) |
-          ((1 << 2) * (cat.find('k') != std::string::npos ? 1 : 0)) |
-          ((1 << 3) * (cat.find('q') != std::string::npos ? 1 : 0));
-    return asd;
+    if constexpr (side == WHITE) {
+        return Castle<WHITE>(cat.find('K') != std::string::npos, cat.find('Q') != std::string::npos);
+    } else {
+        return Castle<BLACK>(cat.find('k') != std::string::npos, cat.find('q') != std::string::npos);
+    }
 }
+
+template Castle<WHITE> FEN::parseCastle<WHITE>(const std::string &);
+template Castle<BLACK> FEN::parseCastle<BLACK>(const std::string &);
 
 uint64_t FEN::parseEnPassant(const std::string &fen) {
     size_t firstSpace = fen.find(' ');
@@ -77,9 +84,8 @@ uint64_t FEN::parsePiece(const std::string &fen, const char &piece) {
             ++slashesMet;
             columnIndex = 0;
         } else if (ch == piece) {
-            const uint64_t formula =
-                (uint64_t)1 << (Utils::COLUMN_NUMBER * Utils::ROW_NUMBER -
-                                slashesMet * Utils::ROW_NUMBER - (Utils::ROW_NUMBER - columnIndex));
+            const uint64_t formula = (uint64_t)1 << (Utils::COLUMN_NUMBER * Utils::ROW_NUMBER - slashesMet * Utils::ROW_NUMBER -
+                                                     (Utils::ROW_NUMBER - columnIndex));
             bitboard |= formula;
             ++columnIndex;
         } else if (std::isdigit(ch)) {

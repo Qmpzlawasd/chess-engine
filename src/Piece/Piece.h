@@ -17,25 +17,13 @@ class Piece {
     Piece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration)
         : whitePieces{whiteConfiguration}, blackPieces{blackConfiguration} {};
 
-    [[nodiscard]] uint64_t getWhite() const { return whitePieces; }
-
-    [[nodiscard]] uint64_t getBlack() const { return blackPieces; }
-};
-
-class SpecialPiece : public Piece {
-  public:
-    SpecialPiece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece(whiteConfiguration, blackConfiguration){};
-};
-
-class Pawn : public SpecialPiece {
-  public:
-    Pawn(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : SpecialPiece(whiteConfiguration, blackConfiguration){};
-    Pawn() : SpecialPiece(0, 0){};
-
     template <Color side>
-    [[nodiscard]] static uint64_t getMoves(const Square &, const uint64_t &) noexcept;
-    template <Color side>
-    [[nodiscard]] static uint64_t getAttacks(const Square &) noexcept;
+    [[nodiscard]] uint64_t getBitboard() const noexcept {
+        if constexpr (side == WHITE) {
+            return whitePieces;
+        }
+        return blackPieces;
+    }
 };
 
 #endif // CHESS_ENGINE_PIECE_H

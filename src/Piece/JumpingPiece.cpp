@@ -1,5 +1,4 @@
 #include "JumpingPiece.h"
-#include "../Utils.h"
 
 [[nodiscard]] uint64_t King::getMoves(const Square &square )  noexcept {
     const uint64_t pieceBitboard = Utils::setSquare(square);

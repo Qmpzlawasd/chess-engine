@@ -43,6 +43,7 @@ class Rook : public SlidingPiece {
     }
 
     [[nodiscard]] static uint64_t getMoves(const Square &square, const uint64_t &emptySquares) noexcept;
+    [[nodiscard]] static uint64_t getThreatens(const Square &square, const uint64_t &allyPieces) noexcept;
 };
 
 class Bishop : public SlidingPiece {
@@ -73,6 +74,7 @@ class Bishop : public SlidingPiece {
     }
 
     [[nodiscard]] static uint64_t getMoves(const Square &square, const uint64_t &emptySquares) noexcept;
+    [[nodiscard]] static uint64_t getThreatens(const Square &square, const uint64_t &allyPieces) noexcept;
 };
 
 class Queen : public SlidingPiece {
@@ -88,6 +90,7 @@ class Queen : public SlidingPiece {
         return Rook::MAGIC_CONSTANTS;
     }
 
+    [[nodiscard]] static uint64_t getThreatens(const Square &square, const uint64_t &allyPieces) noexcept;
     [[nodiscard]] static uint64_t getMoves(const Square &square, const uint64_t &emptySquares) noexcept;
 };
 
