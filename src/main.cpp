@@ -1,17 +1,19 @@
 #include "Board.h"
-#include "Move/Move.h"
+#include "Piece/SpecialPiece.h"
 #include "Utils.h"
 #include <bitset>
+
 int main() {
 
-    const std::string asd = "2r5/8/7k/8/2R5/8/8/2K5 w - - 0 1";
+    const std::string asd = "8/3N4/2b1B1p1/1B2k3/rR1rR1n1/2R3K1/5B2/1r2n3 w - - 0 1";
     Board board{asd};
-    uint64_t table = Bishop::getMoves(G5, 0);
-    Utils::showBitBoard(table);
-    std::vector <Move> as= board.getMovesFromBitboard(G5, table);
-    std::for_each(as.begin(), as.end(), [](const Move &m) {
-        std::cout << m;
-    });
+    Utils::showBitBoard(board.getDangerTable<BLACK>());
+    Utils::showBitBoard(board.isSquareAttacked<WHITE>(E3));
+
+    //    std::vector <Move> as= board.getMovesFromBitboard(G5, table);
+    //    std::for_each(as.begin(), as.end(), [](const Move &m) {
+    //        std::cout << m;
+    //    });
 
     //        MoveBuilder a{};
     //        std::cout << a.toSquare(A1).fromSquare(A2).withKingSideCastle();
