@@ -1,8 +1,8 @@
 #ifndef CHESS_ENGINE_MOVEBUILDER_H
 #define CHESS_ENGINE_MOVEBUILDER_H
 
+#include "Enums/Squares.h"
 #include "Move.h"
-#include "../Squares.h"
 
 class MoveBuilder {
     Move move;

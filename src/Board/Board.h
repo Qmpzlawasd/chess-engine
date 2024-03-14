@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "Colors.h"
+#include "Enums/Squares.h"
 #include "FEN.h"
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
@@ -19,10 +20,11 @@
 #include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
 #include "Piece/SpecialPiece.h"
-#include "Squares.h"
 #include "Utils.h"
 
 class Board {
+    friend class LegalMove;
+    friend class BoardAttack;
 
   public:
     King king;
@@ -53,6 +55,30 @@ class Board {
     [[nodiscard]] bool checkMoveIsEnPassant(const Square &pieceSquare, const uint64_t &bitboard) { return enPassant & bitboard; }
 
     template <Color side>
+    [[nodiscard]] uint64_t getCastleRightsBitboard() const {
+        if (isKingChecked<side>()) {
+            return 0;
+        }
+        if constexpr (side == WHITE) {
+            if (!castleWhite.hasRookMoved<QUEEN_SIDE>()) {
+
+            }
+
+            if (!castleWhite.hasRookMoved<KING_SIDE>()) {
+            }
+
+
+        } else {
+
+        }
+    }
+
+    template <Color side>
+    [[nodiscard]] bool isKingChecked() const noexcept {
+        return isSquareAttacked<side>(Utils::popLSB(king.getBitboard<side>()));
+    }
+
+    template <Color side>
     [[nodiscard]] bool checkMoveIsPromotion(const Square &pieceSquare, const uint64_t &bitboard) {
         if constexpr (side == WHITE) {
             return bitboard & Utils::LAST_ROW;
@@ -76,26 +102,25 @@ class Board {
     }
 
     template <Color side>
-    [[nodiscard]] uint64_t getKingLegalMove() {
-        return ~getDangerTable<side>() & King::getMoves(king.getBitboard<side>());
-    }
+    [[nodiscard]] uint64_t knightAttacksSquare(const Square &) const;
 
-    //    std::vector<Move> getMovesFromBitboard(const Square &pieceSquare, uint64_t bitboard) {
-    //        MoveBuilder moveBuilder;
-    //        std::vector<Move> generatedMoves;
-    //        while (bitboard) {
-    //            const Square to = Utils::popLSB(bitboard);
-    //            //            Utils::showBitBoard(Utils::setSquare(to));
-    //            generatedMoves.push_back(moveBuilder.fromSquare(pieceSquare).toSquare(to).getMove());
-    //        }
-    //        return generatedMoves;
-    //    }
+    template <Color side>
+    [[nodiscard]] uint64_t kingAttacksSquare(const Square &) const;
 
-    //    template <Color side>
-    //    [[nodiscard]] uint64_t getPinnedAlliedPieces() const noexcept {
-    //
-    //
-    //    }
+    template <Color side>
+    [[nodiscard]] uint64_t pawnAttacksSquare(const Square &) const;
+
+    template <Color side>
+    [[nodiscard]] uint64_t rookAttacksSquare(const Square &) const;
+
+    template <Color side>
+    [[nodiscard]] uint64_t queenAttacksSquare(const Square &) const;
+
+    template <Color side>
+    [[nodiscard]] uint64_t isSquareAttacked(const Square &) const;
+
+    template <Color side>
+    [[nodiscard]] uint64_t bishopAttacksSquare(const Square &) const;
 
     //    template <Color side>
     //    [[nodiscard]] uint64_t getPinnedSquares() const {
@@ -117,27 +142,6 @@ class Board {
 
     template <Color side>
     [[nodiscard]] uint64_t getDangerTable() const;
-
-    template <Color side>
-    [[nodiscard]] uint64_t knightAttacksSquare(const Square &square) const;
-
-    template <Color side>
-    [[nodiscard]] uint64_t kingAttacksSquare(const Square &square) const;
-
-    template <Color side>
-    [[nodiscard]] uint64_t pawnAttacksSquare(const Square &square) const;
-
-    template <Color side>
-    [[nodiscard]] uint64_t rookAttacksSquare(const Square &square) const;
-
-    template <Color side>
-    [[nodiscard]] uint64_t queenAttacksSquare(const Square &square) const;
-
-    template <Color side>
-    [[nodiscard]] uint64_t isSquareAttacked(const Square &square) const;
-
-    template <Color side>
-    [[nodiscard]] uint64_t bishopAttacksSquare(const Square &square) const;
 
   public:
     explicit Board(const std::string &fen = "1nbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")

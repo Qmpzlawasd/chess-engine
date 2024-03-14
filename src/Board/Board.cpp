@@ -16,111 +16,6 @@ void Board::printStatus(std::ostream &os) const {
 }
 
 template <Color side>
-[[nodiscard]] uint64_t Board::isSquareAttacked(const Square &square) const {
-    return rookAttacksSquare<side>(square) | bishopAttacksSquare<side>(square) | pawnAttacksSquare<side>(square) |
-           kingAttacksSquare<side>(square) | queenAttacksSquare<side>(square) | knightAttacksSquare<side>(square);
-}
-
-template uint64_t Board::isSquareAttacked<WHITE>(const Square &) const;
-template uint64_t Board::isSquareAttacked<BLACK>(const Square &) const;
-
-template <Color side>
-[[nodiscard]] uint64_t Board::queenAttacksSquare(const Square &square) const {
-    uint64_t enemyQueen;
-    if constexpr (side == WHITE) {
-        enemyQueen = queens.getBitboard<BLACK>();
-    } else {
-        enemyQueen = queens.getBitboard<WHITE>();
-    }
-
-    const uint64_t originQueenAttack = Rook::getMoves(square, getEmptySquares()) | Bishop::getMoves(square, getEmptySquares());
-    return originQueenAttack & enemyQueen;
-}
-
-template uint64_t Board::queenAttacksSquare<WHITE>(const Square &) const;
-template uint64_t Board::queenAttacksSquare<BLACK>(const Square &) const;
-
-template <Color side>
-[[nodiscard]] uint64_t Board::rookAttacksSquare(const Square &square) const {
-    uint64_t enemyRooks;
-    if constexpr (side == WHITE) {
-        enemyRooks = rooks.getBitboard<BLACK>();
-    } else {
-        enemyRooks = rooks.getBitboard<WHITE>();
-    }
-
-    const uint64_t originRookAttack = Rook::getMoves(square, getEmptySquares());
-    return originRookAttack & enemyRooks;
-}
-
-template uint64_t Board::rookAttacksSquare<WHITE>(const Square &square) const;
-template uint64_t Board::rookAttacksSquare<BLACK>(const Square &square) const;
-
-template <Color side>
-[[nodiscard]] uint64_t Board::knightAttacksSquare(const Square &square) const {
-    uint64_t enemyKnight;
-    if constexpr (side == WHITE) {
-        enemyKnight = knights.getBitboard<BLACK>();
-    } else {
-        enemyKnight = knights.getBitboard<WHITE>();
-    }
-
-    const uint64_t originKingAttack = Knight::getMoves(square);
-    return originKingAttack & enemyKnight;
-}
-
-template uint64_t Board::knightAttacksSquare<WHITE>(const Square &square) const;
-template uint64_t Board::knightAttacksSquare<BLACK>(const Square &square) const;
-
-template <Color side>
-[[nodiscard]] uint64_t Board::kingAttacksSquare(const Square &square) const {
-    uint64_t enemyKing;
-    if constexpr (side == WHITE) {
-        enemyKing = king.getBitboard<BLACK>();
-    } else {
-        enemyKing = king.getBitboard<WHITE>();
-    }
-
-    const uint64_t originKingAttack = King::getMoves(square);
-    return originKingAttack & enemyKing;
-}
-
-template uint64_t Board::kingAttacksSquare<WHITE>(const Square &square) const;
-template uint64_t Board::kingAttacksSquare<BLACK>(const Square &square) const;
-
-template <Color side>
-[[nodiscard]] uint64_t Board::pawnAttacksSquare(const Square &square) const {
-    uint64_t enemyPawns;
-    if constexpr (side == WHITE) {
-        enemyPawns = pawns.getBitboard<BLACK>();
-    } else {
-        enemyPawns = pawns.getBitboard<WHITE>();
-    }
-
-    const uint64_t originPawnAttack = Pawn::getThreatens<side>(square);
-    return originPawnAttack & enemyPawns;
-}
-
-template uint64_t Board::pawnAttacksSquare<WHITE>(const Square &square) const;
-template uint64_t Board::pawnAttacksSquare<BLACK>(const Square &square) const;
-
-template <Color side>
-[[nodiscard]] uint64_t Board::bishopAttacksSquare(const Square &square) const {
-    uint64_t enemyBishops;
-    if constexpr (side == WHITE) {
-        enemyBishops = bishops.getBitboard<BLACK>();
-    } else {
-        enemyBishops = bishops.getBitboard<WHITE>();
-    }
-
-    const uint64_t originBishopAttack = Bishop::getMoves(square, getEmptySquares());
-    return originBishopAttack & enemyBishops;
-}
-
-template uint64_t Board::bishopAttacksSquare<WHITE>(const Square &square) const;
-template uint64_t Board::bishopAttacksSquare<BLACK>(const Square &square) const;
-
-template <Color side>
 [[nodiscard]] uint64_t Board::getDangerTable() const {
     uint64_t danger = 0;
 
@@ -158,3 +53,86 @@ template <Color side>
 
 template uint64_t Board::getDangerTable<WHITE>() const;
 template uint64_t Board::getDangerTable<BLACK>() const;
+
+#include "Board.h"
+#include "../Colors.h"
+#include "../Piece/JumpingPiece.h"
+#include "../Piece/SlidingPiece.h"
+#include "../Piece/SpecialPiece.h"
+#include "../Utils.h"
+#include <cstdint>
+
+template <Color side>
+[[nodiscard]] uint64_t Board::isSquareAttacked(const Square &square) const {
+    return rookAttacksSquare<side>(square) | bishopAttacksSquare<side>(square) | pawnAttacksSquare<side>(square) |
+           kingAttacksSquare<side>(square) | queenAttacksSquare<side>(square) | knightAttacksSquare<side>(square);
+}
+
+template uint64_t Board::isSquareAttacked<WHITE>(const Square &) const;
+template uint64_t Board::isSquareAttacked<BLACK>(const Square &) const;
+
+template <Color side>
+[[nodiscard]] uint64_t Board::queenAttacksSquare(const Square &square) const {
+    const uint64_t enemyQueen = queens.getBitboard<Utils::flipColor(side)>();
+    const uint64_t originQueenAttack = Rook::getMoves(square, getEmptySquares()) | Bishop::getMoves(square, getEmptySquares());
+
+    return originQueenAttack & enemyQueen;
+}
+
+template uint64_t Board::queenAttacksSquare<WHITE>(const Square &) const;
+template uint64_t Board::queenAttacksSquare<BLACK>(const Square &) const;
+
+template <Color side>
+[[nodiscard]] uint64_t Board::rookAttacksSquare(const Square &square) const {
+    const uint64_t enemyRooks = rooks.getBitboard<Utils::flipColor(side)>();
+    const uint64_t originRookAttack = Rook::getMoves(square, getEmptySquares());
+
+    return originRookAttack & enemyRooks;
+}
+
+template uint64_t Board::rookAttacksSquare<WHITE>(const Square &square) const;
+template uint64_t Board::rookAttacksSquare<BLACK>(const Square &square) const;
+
+template <Color side>
+[[nodiscard]] uint64_t Board::knightAttacksSquare(const Square &square) const {
+    const uint64_t enemyKnight = knights.getBitboard<Utils::flipColor(side)>();
+    const uint64_t originKingAttack = Knight::getMoves(square);
+
+    return originKingAttack & enemyKnight;
+}
+
+template uint64_t Board::knightAttacksSquare<WHITE>(const Square &square) const;
+template uint64_t Board::knightAttacksSquare<BLACK>(const Square &square) const;
+
+template <Color side>
+[[nodiscard]] uint64_t Board::kingAttacksSquare(const Square &square) const {
+    const uint64_t enemyKing = king.getBitboard<Utils::flipColor(side)>();
+    const uint64_t originKingAttack = King::getMoves(square);
+
+    return originKingAttack & enemyKing;
+}
+
+template uint64_t Board::kingAttacksSquare<WHITE>(const Square &square) const;
+template uint64_t Board::kingAttacksSquare<BLACK>(const Square &square) const;
+
+template <Color side>
+[[nodiscard]] uint64_t Board::pawnAttacksSquare(const Square &square) const {
+    const uint64_t enemyPawns = pawns.getBitboard<Utils::flipColor(side)>();
+    const uint64_t originPawnAttack = Pawn::getThreatens<side>(square);
+
+    return originPawnAttack & enemyPawns;
+}
+
+template uint64_t Board::pawnAttacksSquare<WHITE>(const Square &square) const;
+template uint64_t Board::pawnAttacksSquare<BLACK>(const Square &square) const;
+
+template <Color side>
+[[nodiscard]] uint64_t Board::bishopAttacksSquare(const Square &square) const {
+    const uint64_t enemyBishops = bishops.getBitboard<Utils::flipColor(side)>();
+    const uint64_t originBishopAttack = Bishop::getMoves(square, getEmptySquares());
+
+    return originBishopAttack & enemyBishops;
+}
+
+template uint64_t Board::bishopAttacksSquare<WHITE>(const Square &square) const;
+template uint64_t Board::bishopAttacksSquare<BLACK>(const Square &square) const;

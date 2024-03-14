@@ -1,6 +1,6 @@
 #ifndef CHESS_ENGINE_MOVE_H
 #define CHESS_ENGINE_MOVE_H
-#include "Squares.h"
+#include "Enums/Squares.h"
 #include "Utils.h"
 #include <cstdint>
 #include <fstream>

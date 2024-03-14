@@ -1,7 +1,7 @@
 #ifndef CHESS_ENGINE_JUMPINGPIECE_H
 #define CHESS_ENGINE_JUMPINGPIECE_H
 
-#include "../Squares.h"
+#include "Enums/Squares.h"
 #include "Piece.h"
 #include <cstdint>
 class JumpingPiece : public Piece {

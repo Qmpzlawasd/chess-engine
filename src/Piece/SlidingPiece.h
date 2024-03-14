@@ -1,8 +1,8 @@
 #ifndef CHESS_ENGINE_SLIDINGPIECE_H
 #define CHESS_ENGINE_SLIDINGPIECE_H
 
-#include "../Squares.h"
 #include "../Utils.h"
+#include "Enums/Squares.h"
 #include "Piece.h"
 #include <cstdint>
 class SlidingPiece : public Piece {

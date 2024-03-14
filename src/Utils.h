@@ -2,7 +2,7 @@
 #define CHESS_ENGINE_UTILS_H
 
 #include "Colors.h"
-#include "Squares.h"
+#include "Enums/Squares.h"
 #include <bitset>
 #include <functional>
 #include <iostream>

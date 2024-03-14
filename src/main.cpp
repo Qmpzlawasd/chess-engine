@@ -1,12 +1,15 @@
-#include "Board.h"
+#include "Board/Board.h"
+#include "Board/LegalMove.h"
 #include "Utils.h"
 #include <bitset>
 
 int main() {
-        // add castles info
+        // implement castles
     const std::string asd = "8/1rk1P3/2B3P1/1B3N2/PrRK2Pp/4N1P1/1q3b2/3r3B w - - 0 1";
     Board board{asd};
-    Utils::showBitBoard(board.getKingLegalMove<WHITE>());
+    LegalMove legalMove{board};
+    Utils::showBitBoard(legalMove.getKingLegalMove<WHITE>());
+
 //    Utils::showBitBoard(board.isSquareAttacked<WHITE>(E3));
 
     //    std::vector <Move> as= board.getMovesFromBitboard(G5, table);
