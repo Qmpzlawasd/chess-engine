@@ -120,3 +120,41 @@ template <Color side>
 template uint64_t Board::bishopAttacksSquare<WHITE>(const Square &square) const;
 template uint64_t Board::bishopAttacksSquare<BLACK>(const Square &square) const;
 
+template <Color side>
+[[nodiscard]] uint64_t Board::getDangerTable() const {
+    uint64_t danger = 0;
+
+    auto computeDangers = [&danger, this](const Square &square) -> void {
+        if (Utils::setSquare(square) & rooks.getBitboard<Utils::flipColor(side)>()) {
+            danger |=
+                Rook::getThreatens(square,
+                                   getOccupiedSquares<Utils::flipColor(side)>() | (getOccupiedSquares<side>() ^ king.getBitboard<side>()));
+
+                    } else if (Utils::setSquare(square) & bishops.getBitboard<Utils::flipColor(side)>()) {
+                        danger |= Bishop::getThreatens(square,
+                                                       getOccupiedSquares<Utils::flipColor(side)>() |
+                                                           (getOccupiedSquares<side>() ^ king.getBitboard<side>()));
+
+                    } else if (Utils::setSquare(square) & queens.getBitboard<Utils::flipColor(side)>()) {
+                        danger |=
+                            Queen::getThreatens(square,
+                                                getOccupiedSquares<Utils::flipColor(side)>() | (getOccupiedSquares<side>() ^
+                                                king.getBitboard<side>()));
+
+                    } else if (Utils::setSquare(square) & king.getBitboard<Utils::flipColor(side)>()) {
+                        danger |= King::getMoves(square);
+
+                    } else if (Utils::setSquare(square) & pawns.getBitboard<Utils::flipColor(side)>()) {
+                        danger |= Pawn::getThreatens<Utils::flipColor(side)>(square);
+
+                    } else if (Utils::setSquare(square) & knights.getBitboard<Utils::flipColor(side)>()) {
+                        danger |= Knight::getMoves(square);
+        }
+    };
+
+    Utils::runForEachSetBit(getOccupiedSquares<Utils::flipColor(side)>(), computeDangers);
+    return danger |(getOccupiedSquares<side>() ^ king.getBitboard<side>());
+}
+
+template uint64_t Board::getDangerTable<WHITE>() const;
+template uint64_t Board::getDangerTable<BLACK>() const;

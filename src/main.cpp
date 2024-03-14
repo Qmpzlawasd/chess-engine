@@ -1,14 +1,13 @@
 #include "Board.h"
-#include "Piece/SpecialPiece.h"
 #include "Utils.h"
 #include <bitset>
 
 int main() {
-
-    const std::string asd = "8/3N4/2b1B1p1/1B2k3/rR1rR1n1/2R3K1/5B2/1r2n3 w - - 0 1";
+        // add castles info
+    const std::string asd = "8/1rk1P3/2B3P1/1B3N2/PrRK2Pp/4N1P1/1q3b2/3r3B w - - 0 1";
     Board board{asd};
-    Utils::showBitBoard(board.getDangerTable<BLACK>());
-    Utils::showBitBoard(board.isSquareAttacked<WHITE>(E3));
+    Utils::showBitBoard(board.getKingLegalMove<WHITE>());
+//    Utils::showBitBoard(board.isSquareAttacked<WHITE>(E3));
 
     //    std::vector <Move> as= board.getMovesFromBitboard(G5, table);
     //    std::for_each(as.begin(), as.end(), [](const Move &m) {
@@ -23,3 +22,4 @@ int main() {
     //    Utils::showBitBoard(board.getPinnedSquares<BLACK>());
     //    Utils::showBitBoard(Pawn::getMoves<BLACK>(C7,board.getEmptySquares() & Utils::setSquare(C7)));
 }
+
