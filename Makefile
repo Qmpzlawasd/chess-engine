@@ -10,7 +10,7 @@ TEST_DIR = tests
 TARGET = main
 
 ENGINE_DEPS = $(wildcard $(SRC_DIR)/*.h)
-ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp)
+ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp) $(wildcard $(SRC_DIR)/Board/*.cpp)
 
 .PHONY: pre-build all engine engine-debug run
 

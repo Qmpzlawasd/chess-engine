@@ -1,7 +1,7 @@
 #ifndef CHESS_ENGINE_SPECIALPIECE_H
 #define CHESS_ENGINE_SPECIALPIECE_H
 
-#include "../Squares.h"
+#include "Enums/Squares.h"
 #include "Piece.h"
 #include <cstdint>
 

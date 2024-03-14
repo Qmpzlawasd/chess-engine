@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Enums/Squares.h"
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
 #include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
-#include "Squares.h"
 #include <array>
 #include <bitset>
 #include <functional>
