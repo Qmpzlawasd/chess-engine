@@ -11,7 +11,7 @@ void Utils::showBitBoard(const Square &square) { showBitBoard(Utils::setSquare(s
 
 void Utils::showBitBoard(const uint64_t &board) {
     for (int8_t i = ROW_NUMBER - 1; i >= 0; i--) {
-        showReversedBin((board >> (i * ROW_NUMBER)) & ((unsigned int)(1 << ROW_NUMBER) - 1));
+        showReversedBin((board >> (i * ROW_NUMBER)) & (static_cast<unsigned int>(1 << ROW_NUMBER) - 1));
     }
     printf("\n");
 }
@@ -22,7 +22,7 @@ void Utils::showBitBoard(const uint64_t &board) {
  */
 uint64_t Utils::getIthFile(const uint64_t &table, const int &I) { return table & A_FILE >> I; }
 
-uint64_t Utils::setSquare(const Square &square) { return (uint64_t)1 << square; }
+uint64_t Utils::setSquare(const Square &square) { return static_cast<uint64_t>(1) << square; }
 
 /**
  * @param[in] value bitboard

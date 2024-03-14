@@ -13,6 +13,8 @@ class SlidingPiece : public Piece {
     [[nodiscard]] virtual uint64_t getNaiveAttackPattern(const Square &) const noexcept = 0;
     [[nodiscard]] virtual uint64_t getBlockedAttackPattern(const Square &, const uint64_t &) const noexcept = 0;
     [[nodiscard]] virtual const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept = 0;
+
+    virtual ~SlidingPiece() = default;
 };
 
 class Rook : public SlidingPiece {

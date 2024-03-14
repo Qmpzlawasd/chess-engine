@@ -29,7 +29,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
 
     uint64_t filledPattern = 0;
     for (int i = column + 1; i < Utils::COLUMN_NUMBER; ++i) {
-        const uint64_t nextSquareSet = (uint64_t)1 << (line * Utils::COLUMN_NUMBER + i);
+        const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (line * Utils::COLUMN_NUMBER + i);
         filledPattern |= nextSquareSet;
 
         if ((nextSquareSet & pattern) != 0) {
@@ -38,7 +38,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     }
 
     for (int i = column - 1; i >= 0; --i) {
-        const uint64_t nextSquareSet = (uint64_t)1 << (line * Utils::COLUMN_NUMBER + i);
+        const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (line * Utils::COLUMN_NUMBER + i);
         filledPattern |= nextSquareSet;
         if ((nextSquareSet & pattern) != 0) {
             break;
@@ -46,7 +46,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     }
 
     for (int i = line + 1; i < Utils::ROW_NUMBER; ++i) {
-        const uint64_t nextSquareSet = (uint64_t)1 << (i * Utils::COLUMN_NUMBER + column);
+        const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (i * Utils::COLUMN_NUMBER + column);
         filledPattern |= nextSquareSet;
         if ((nextSquareSet & pattern) != 0) {
             break;
@@ -54,7 +54,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     }
 
     for (int i = line - 1; i >= 0; --i) {
-        const uint64_t nextSquareSet = (uint64_t)1 << (i * Utils::COLUMN_NUMBER + column);
+        const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (i * Utils::COLUMN_NUMBER + column);
         filledPattern |= nextSquareSet;
         if ((nextSquareSet & pattern) != 0) {
             break;
@@ -64,28 +64,28 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     return filledPattern;
 }
 
-//uint64_t Rook::getBlockedAttackPattern(const uint64_t &pieces, const uint64_t &pattern) const noexcept {
-//    puts("DO NOT USE getBlockedAttackPattern");
-//    constexpr uint64_t borderBitBoard = Utils::A_FILE | Utils::H_FILE;
-//    uint64_t attackPiecesVertical = pieces;
-//    uint64_t attackPiecesHorizontal = pieces;
-//    for (int i = 0; i < Utils::COLUMN_NUMBER; ++i) {
-//        attackPiecesHorizontal |= (attackPiecesHorizontal >> (Utils::ROW_NUMBER)) & ~pattern;
-//    }
-//    for (int i = 0; i < Utils::COLUMN_NUMBER; ++i) {
-//        attackPiecesHorizontal |= (attackPiecesHorizontal << (Utils::ROW_NUMBER)) & ~pattern;
-//    }
+// uint64_t Rook::getBlockedAttackPattern(const uint64_t &pieces, const uint64_t &pattern) const noexcept {
+//     puts("DO NOT USE getBlockedAttackPattern");
+//     constexpr uint64_t borderBitBoard = Utils::A_FILE | Utils::H_FILE;
+//     uint64_t attackPiecesVertical = pieces;
+//     uint64_t attackPiecesHorizontal = pieces;
+//     for (int i = 0; i < Utils::COLUMN_NUMBER; ++i) {
+//         attackPiecesHorizontal |= (attackPiecesHorizontal >> (Utils::ROW_NUMBER)) & ~pattern;
+//     }
+//     for (int i = 0; i < Utils::COLUMN_NUMBER; ++i) {
+//         attackPiecesHorizontal |= (attackPiecesHorizontal << (Utils::ROW_NUMBER)) & ~pattern;
+//     }
 //
-//    for (int i = 0; i < Utils::ROW_NUMBER; ++i) {
-//        attackPiecesVertical |= (attackPiecesVertical >> 1) & (~pattern & ~borderBitBoard);
-//    }
-//    attackPiecesVertical |= (attackPiecesVertical >> 1) & ~pattern;
-//    for (int i = 0; i < Utils::ROW_NUMBER; ++i) {
-//        attackPiecesVertical |= (attackPiecesVertical << 1) & (~pattern & ~borderBitBoard);
-//    }
-//    attackPiecesVertical |= (attackPiecesVertical << 1) & ~pattern;
-//    return (attackPiecesHorizontal | attackPiecesVertical) & ~pieces;
-//}
+//     for (int i = 0; i < Utils::ROW_NUMBER; ++i) {
+//         attackPiecesVertical |= (attackPiecesVertical >> 1) & (~pattern & ~borderBitBoard);
+//     }
+//     attackPiecesVertical |= (attackPiecesVertical >> 1) & ~pattern;
+//     for (int i = 0; i < Utils::ROW_NUMBER; ++i) {
+//         attackPiecesVertical |= (attackPiecesVertical << 1) & (~pattern & ~borderBitBoard);
+//     }
+//     attackPiecesVertical |= (attackPiecesVertical << 1) & ~pattern;
+//     return (attackPiecesHorizontal | attackPiecesVertical) & ~pieces;
+// }
 
 uint64_t Bishop::getNaiveAttackPattern(const Square &square) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
@@ -172,4 +172,3 @@ uint64_t Queen::getThreatens(const Square &square, const uint64_t &allyPieces) n
 uint64_t Queen::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
     return Rook{}.getBlockedAttackPattern(square, pattern) | Bishop{}.getBlockedAttackPattern(square, pattern);
 }
-

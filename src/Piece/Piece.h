@@ -24,6 +24,8 @@ class Piece {
         }
         return blackPieces;
     }
+
+    virtual ~Piece() = default;
 };
 
 #endif // CHESS_ENGINE_PIECE_H

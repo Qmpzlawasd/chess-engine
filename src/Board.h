@@ -75,7 +75,10 @@ class Board {
         return enPassant & bitboard;
     }
 
-
+    template <Color side>
+    [[nodiscard]] uint64_t getKingLegalMove() {
+        return ~getDangerTable<side>() & King::getMoves(king.getBitboard<side>());
+    }
 
     //    std::vector<Move> getMovesFromBitboard(const Square &pieceSquare, uint64_t bitboard) {
     //        MoveBuilder moveBuilder;
@@ -113,37 +116,7 @@ class Board {
     //    }
 
     template <Color side>
-    [[nodiscard]] uint64_t getDangerTable() const {
-        uint64_t danger;
-        auto computeDangers = [&danger, this](const Square &square) -> void {
-            if (Utils::setSquare(square) & rooks.getBitboard<WHITE>()) {
-                danger |=
-                    Rook::getThreatens(square, getOccupiedSquares<WHITE>() | (getOccupiedSquares<BLACK>() ^ king.getBitboard<BLACK>()));
-
-            } else if (Utils::setSquare(square) & bishops.getBitboard<WHITE>()) {
-                danger |=
-                    Bishop::getThreatens(square, getOccupiedSquares<WHITE>() | (getOccupiedSquares<BLACK>() ^ king.getBitboard<BLACK>()));
-
-            } else if (Utils::setSquare(square) & queens.getBitboard<WHITE>()) {
-                danger |=
-                    Queen::getThreatens(square, getOccupiedSquares<WHITE>() | (getOccupiedSquares<BLACK>() ^ king.getBitboard<BLACK>()));
-
-            } else if (Utils::setSquare(square) & king.getBitboard<WHITE>()) {
-                danger |= King::getMoves(square);
-
-            } else if (Utils::setSquare(square) & pawns.getBitboard<WHITE>()) {
-                danger |= Pawn::getThreatens<side>(square);
-
-            } else if (Utils::setSquare(square) & knights.getBitboard<WHITE>()) {
-                danger |= Knight::getMoves(square);
-            }
-        };
-
-        if constexpr (side == BLACK) {
-            Utils::runForEachSetBit(getOccupiedSquares<WHITE>(), computeDangers);
-        }
-        return danger | getOccupiedSquares<BLACK>();
-    }
+    [[nodiscard]] uint64_t getDangerTable() const;
 
     template <Color side>
     [[nodiscard]] uint64_t knightAttacksSquare(const Square &square) const;
@@ -176,8 +149,6 @@ class Board {
           fullmoveNumber{FEN::parseFullmoveNumber(fen)} {};
 
     ~Board() = default;
-
-
 
     friend std::ostream &operator<<(std::ostream &os, const Board &board) {
         board.printStatus(os);

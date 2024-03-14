@@ -10,19 +10,19 @@ class JumpingPiece : public Piece {
 };
 
 class King : public JumpingPiece {
+
   public:
     King(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : JumpingPiece(whiteConfiguration, blackConfiguration){};
     King() : JumpingPiece(0, 0){};
 
-
-    [[nodiscard]] static uint64_t getMoves(const Square &square) noexcept;
+    [[nodiscard]] static uint64_t getMoves(const Square &) noexcept;
+    [[nodiscard]] static uint64_t getMoves(const uint64_t &) noexcept;
 };
 
 class Knight : public JumpingPiece {
   public:
     Knight(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : JumpingPiece(whiteConfiguration, blackConfiguration){};
     Knight() : JumpingPiece(0, 0){};
-
 
     [[nodiscard]] static uint64_t getMoves(const Square &square) noexcept;
 };

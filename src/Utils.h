@@ -1,6 +1,7 @@
 #ifndef CHESS_ENGINE_UTILS_H
 #define CHESS_ENGINE_UTILS_H
 
+#include "Colors.h"
 #include "Squares.h"
 #include <bitset>
 #include <functional>
@@ -47,6 +48,13 @@ class Utils {
             callEachBit(setSquare);
         }
     }
+
+    [[nodiscard]] static consteval Color flipColor(const Color &color) {
+        if (color == WHITE) {
+            return BLACK;
+        }
+        return WHITE;
+    };
 
     static void showBitBoard(const uint64_t &);
 

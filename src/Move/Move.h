@@ -63,7 +63,8 @@ class Move {
     [[nodiscard]] bool isPromotion() const { return move & 0x8; }
 
     friend std::ostream &operator<<(std::ostream &os, const Move &_move) {
-        os << (int)_move.getFrom() << "->" << (int)_move.getTo() << " " << (int)_move.getFlags() << '\n';
+        os << static_cast<int>(_move.getFrom()) << "->" << static_cast<int>(_move.getTo()) << " " << static_cast<int>(_move.getFlags())
+           << '\n';
         return os;
     }
 };

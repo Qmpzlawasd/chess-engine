@@ -1,6 +1,6 @@
 #include "JumpingPiece.h"
 
-[[nodiscard]] uint64_t King::getMoves(const Square &square )  noexcept {
+[[nodiscard]] uint64_t King::getMoves(const Square &square) noexcept {
     const uint64_t pieceBitboard = Utils::setSquare(square);
 
     const uint64_t attackLeft = (pieceBitboard & ~Utils::A_FILE) >> 1;
@@ -14,7 +14,22 @@
     const uint64_t attackRightUp = (pieceBitboard & ~Utils::H_FILE) << (Utils::ROW_NUMBER + 1);
     const uint64_t attackRightDown = (pieceBitboard & ~Utils::H_FILE) >> (Utils::ROW_NUMBER - 1);
 
-    return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown) ;
+    return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown);
+}
+
+[[nodiscard]] uint64_t King::getMoves(const uint64_t &pieceBitboard) noexcept {
+    const uint64_t attackLeft = (pieceBitboard & ~Utils::A_FILE) >> 1;
+    const uint64_t attackRight = (pieceBitboard & ~Utils::H_FILE) << 1;
+
+    const uint64_t attackUp = (pieceBitboard >> Utils::ROW_NUMBER);
+    const uint64_t attackDown = (pieceBitboard << Utils::ROW_NUMBER);
+
+    const uint64_t attackLeftUp = (pieceBitboard & ~Utils::A_FILE) << (Utils::ROW_NUMBER - 1);
+    const uint64_t attackLeftDown = (pieceBitboard & ~Utils::A_FILE) >> (Utils::ROW_NUMBER + 1);
+    const uint64_t attackRightUp = (pieceBitboard & ~Utils::H_FILE) << (Utils::ROW_NUMBER + 1);
+    const uint64_t attackRightDown = (pieceBitboard & ~Utils::H_FILE) >> (Utils::ROW_NUMBER - 1);
+
+    return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown);
 }
 
 [[nodiscard]] uint64_t Knight::getMoves(const Square &square) noexcept {

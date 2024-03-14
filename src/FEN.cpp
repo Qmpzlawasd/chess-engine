@@ -40,7 +40,7 @@ uint64_t FEN::parseEnPassant(const std::string &fen) {
     const uint8_t number = cat[1] - '1';
     const uint8_t letter = cat[0] - 'a';
 
-    return (uint64_t)1 << (Utils::ROW_NUMBER * number + letter);
+    return static_cast<uint64_t>(1) << (Utils::ROW_NUMBER * number + letter);
 }
 
 uint8_t FEN::parseHalfmoveClock(const std::string &fen) {
