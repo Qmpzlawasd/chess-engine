@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Piece/SlidingPiece.h"
-#include <vector>
 
 class MagicValuesGeneratorInterface {
   public:

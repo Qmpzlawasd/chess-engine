@@ -4,6 +4,7 @@
 #include "Enums/Squares.h"
 #include "Piece.h"
 #include <cstdint>
+#include "../Utils.h"
 
 class SpecialPiece : public Piece {
   public:

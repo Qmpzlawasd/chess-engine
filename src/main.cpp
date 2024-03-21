@@ -1,16 +1,20 @@
-#include "Board/Board.h"
+//#include "Board/Board.h"
 #include "Board/LegalMove.h"
-#include "Utils.h"
-#include <bitset>
 
 int main() {
-        // implement castles
-    const std::string asd = "8/1rk1P3/2B3P1/1B3N2/PrRK2Pp/4N1P1/1q3b2/3r3B w - - 0 1";
+    // implement pins
+    const std::string asd = "q5b1/1R6/4P3/q1BK1B1r/8/8/2k5/6R1 w - - 0 1";
     Board board{asd};
     LegalMove legalMove{board};
-    Utils::showBitBoard(legalMove.getKingLegalMove<WHITE>());
+    const uint64_t a = board.getPinMaskHV<WHITE>();
+    const uint64_t b = board.getPinMaskD12<WHITE>();
+    Utils::showBitBoard(a);
+    Utils::showBitBoard(b);
+//        std::for_each(legalMove.getKingLegalMove<WHITE>().begin(), legalMove.getKingLegalMove<WHITE>().end(), [](const Move &move) {
+//            std::cout << move;
+//        });
 
-//    Utils::showBitBoard(board.isSquareAttacked<WHITE>(E3));
+    //    Utils::showBitBoard(board.isSquareAttacked<WHITE>(E3));
 
     //    std::vector <Move> as= board.getMovesFromBitboard(G5, table);
     //    std::for_each(as.begin(), as.end(), [](const Move &m) {
@@ -25,4 +29,3 @@ int main() {
     //    Utils::showBitBoard(board.getPinnedSquares<BLACK>());
     //    Utils::showBitBoard(Pawn::getMoves<BLACK>(C7,board.getEmptySquares() & Utils::setSquare(C7)));
 }
-

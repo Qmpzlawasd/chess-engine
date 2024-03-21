@@ -1,13 +1,8 @@
 #ifndef CHESS_ENGINE_BOARD_H
 #define CHESS_ENGINE_BOARD_H
 
-#include <bitset>
 #include <cstdint>
-#include <fstream>
 #include <iostream>
-#include <thread>
-#include <unordered_map>
-#include <vector>
 
 #include "Colors.h"
 #include "Enums/Squares.h"
@@ -24,7 +19,6 @@
 
 class Board {
     friend class LegalMove;
-    friend class BoardAttack;
 
   public:
     King king;
@@ -52,34 +46,19 @@ class Board {
 
     void printStatus(std::ostream &os) const;
 
-    [[nodiscard]] bool checkMoveIsEnPassant(const Square &pieceSquare, const uint64_t &bitboard) { return enPassant & bitboard; }
+    [[nodiscard]] bool checkMoveIsEnPassant(const uint64_t &bitboard) { return enPassant & bitboard; }
 
     template <Color side>
-    [[nodiscard]] uint64_t getCastleRightsBitboard() const {
-        if (isKingChecked<side>()) {
-            return 0;
-        }
-        if constexpr (side == WHITE) {
-            if (!castleWhite.hasRookMoved<QUEEN_SIDE>()) {
-
-            }
-
-            if (!castleWhite.hasRookMoved<KING_SIDE>()) {
-            }
-
-
-        } else {
-
-        }
-    }
+    [[nodiscard]] uint64_t getCastleRightsBitboard() const noexcept;
 
     template <Color side>
     [[nodiscard]] bool isKingChecked() const noexcept {
-        return isSquareAttacked<side>(Utils::popLSB(king.getBitboard<side>()));
+        uint64_t kingBoard = king.getBitboard<side>();
+        return isSquareAttacked<side>(Utils::popLSB(kingBoard));
     }
 
     template <Color side>
-    [[nodiscard]] bool checkMoveIsPromotion(const Square &pieceSquare, const uint64_t &bitboard) {
+    [[nodiscard]] bool checkMoveIsPromotion(const uint64_t &bitboard) {
         if constexpr (side == WHITE) {
             return bitboard & Utils::LAST_ROW;
         } else {
@@ -88,17 +67,12 @@ class Board {
     }
 
     template <Color side>
-    [[nodiscard]] bool checkMoveIsCapture(const Square &pieceSquare, const uint64_t &bitboard) {
+    [[nodiscard]] bool checkMoveIsCapture(const uint64_t &bitboard) {
         if constexpr (side == WHITE) {
             return bitboard & getOccupiedSquares<BLACK>();
         } else {
             return bitboard & getOccupiedSquares<WHITE>();
         }
-    }
-
-    template <Color side>
-    [[nodiscard]] bool checkMoveIsCastle(const Square &pieceSquare, const uint64_t &bitboard) {
-        return enPassant & bitboard;
     }
 
     template <Color side>
@@ -122,23 +96,11 @@ class Board {
     template <Color side>
     [[nodiscard]] uint64_t bishopAttacksSquare(const Square &) const;
 
-    //    template <Color side>
-    //    [[nodiscard]] uint64_t getPinnedSquares() const {
-    //        uint64_t rooksRays, bishopsRays;
-    //        uint64_t kingAsRookRay, kingAsBishopRay;
-    //        if constexpr (side == WHITE) {
-    //            rooksRays = rooks.getBlockedAttackPattern(rooks.getBitboard<BLACK>(), ~getEmptySquares());
-    //            kingAsRookRay = rooks.getBlockedAttackPattern(king.getBitboard<WHITE>(), ~getEmptySquares());
-    //            bishopsRays = bishops.getBlockedAttackPattern(Square(bishops.getBitboard<BLACK>()), ~getEmptySquares());
-    //            kingAsBishopRay = bishops.getBlockedAttackPattern(Square(king.getBitboard<BLACK>()), ~getEmptySquares());
-    //        } else {
-    //            rooksRays = rooks.getBlockedAttackPattern(rooks.getBitboard<WHITE>(), ~getEmptySquares());
-    //            kingAsRookRay = rooks.getBlockedAttackPattern(king.getBitboard<BLACK>(), ~getEmptySquares());
-    //            bishopsRays = bishops.getBlockedAttackPattern(Square(bishops.getBitboard<WHITE>()), ~getEmptySquares());
-    //            kingAsBishopRay = bishops.getBlockedAttackPattern(Square(king.getBitboard<WHITE>()), ~getEmptySquares());
-    //        }
-    //        return (rooksRays & kingAsRookRay);
-    //    }
+    template <Color side>
+    [[nodiscard]] uint64_t getPinMaskHV() const;
+
+    template <Color side>
+    [[nodiscard]] uint64_t getPinMaskD12() const;
 
     template <Color side>
     [[nodiscard]] uint64_t getDangerTable() const;
