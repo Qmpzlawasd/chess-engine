@@ -68,3 +68,4 @@ Move MoveBuilder::getMove() {
     move.resetMove();
     return moveCopy;
 }
+MoveBuilder::MoveBuilder() : move(0) {}

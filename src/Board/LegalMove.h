@@ -4,7 +4,9 @@
 #include "../Colors.h"
 #include "../Piece/JumpingPiece.h"
 #include "Board.h"
+
 #include <cstdint>
+
 class LegalMove {
     Board board;
 
@@ -12,22 +14,22 @@ class LegalMove {
     explicit LegalMove(const Board &board) noexcept : board{board} {}
 
     template <Color side>
-    [[nodiscard]] uint64_t getBishopLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getBishopLegalMove() const noexcept;
 
     template <Color side>
-    [[nodiscard]] uint64_t getRookLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getRookLegalMove() const noexcept;
 
     template <Color side>
-    [[nodiscard]] uint64_t getPawnLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getPawnLegalMove() const noexcept;
 
     template <Color side>
-    [[nodiscard]] uint64_t getKnightLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getKnightLegalMove() const noexcept;
 
     template <Color side>
-    [[nodiscard]] uint64_t getQueenLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getQueenLegalMove() const noexcept;
 
     template <Color side>
-    [[nodiscard]] uint64_t getKingLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getKingLegalMove() const noexcept;
 };
 
 #endif // CHESS_ENGINE_LEGALMOVE_H

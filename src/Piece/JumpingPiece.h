@@ -2,8 +2,10 @@
 #define CHESS_ENGINE_JUMPINGPIECE_H
 
 #include "Enums/Squares.h"
+#include "../Utils.h"
 #include "Piece.h"
 #include <cstdint>
+
 class JumpingPiece : public Piece {
   public:
     JumpingPiece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece(whiteConfiguration, blackConfiguration){};

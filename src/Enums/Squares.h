@@ -1,4 +1,5 @@
 #pragma once
+
 enum Square {
     A1,
     B1,
@@ -65,4 +66,3 @@ enum Square {
     G8,
     H8,
 };
-

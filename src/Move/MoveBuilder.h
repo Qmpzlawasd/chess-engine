@@ -7,7 +7,10 @@
 class MoveBuilder {
     Move move;
 
+
   public:
+    explicit MoveBuilder();
+
     MoveBuilder &toSquare(const Square &);
 
     MoveBuilder &fromSquare(const Square &);

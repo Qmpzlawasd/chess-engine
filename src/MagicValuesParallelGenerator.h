@@ -5,13 +5,11 @@
 #include "MagicValuesGeneratorInterface.h"
 #include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
-#include <array>
-#include <bitset>
+
 #include <functional>
 #include <thread>
 #include <unordered_map>
 #include <vector>
-
 #include <cassert>
 
 class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {

@@ -4,7 +4,11 @@
 #include "../Utils.h"
 #include "Enums/Squares.h"
 #include "Piece.h"
+
 #include <cstdint>
+#include <vector>
+#include <array>
+
 class SlidingPiece : public Piece {
   public:
     SlidingPiece(const uint64_t &whiteConfiguration, const uint64_t &blackConfiguration) : Piece(whiteConfiguration, blackConfiguration){};
@@ -69,7 +73,7 @@ class Bishop : public SlidingPiece {
     virtual ~Bishop() = default;
 
     [[nodiscard]] uint64_t getNaiveAttackPattern(const Square &square) const noexcept override;
-    [[nodiscard]] uint64_t getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept override;
+    [[nodiscard]] uint64_t getBlockedAttackPattern(const Square &square, const uint64_t &blockerPattern) const noexcept override;
     [[nodiscard]] uint8_t getShiftValue() const noexcept override { return Bishop::SHIFT_VALUE; }
     [[nodiscard]] const std::array<uint64_t, Utils::NUMBER_SQUARES_TABLE> &getMagicConstants() const noexcept override {
         return Bishop::MAGIC_CONSTANTS;

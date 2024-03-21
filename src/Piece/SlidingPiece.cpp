@@ -23,7 +23,7 @@ uint64_t Rook::getThreatens(const Square &square, const uint64_t &allyPieces) no
     return magicBitboard.rookMoveTable[square][optimisedIndex];
 }
 
-uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
+uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &blockerPattern) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
     const uint8_t line = square / Utils::COLUMN_NUMBER;
 
@@ -32,7 +32,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
         const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (line * Utils::COLUMN_NUMBER + i);
         filledPattern |= nextSquareSet;
 
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
@@ -40,7 +40,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     for (int i = column - 1; i >= 0; --i) {
         const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (line * Utils::COLUMN_NUMBER + i);
         filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
@@ -48,7 +48,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     for (int i = line + 1; i < Utils::ROW_NUMBER; ++i) {
         const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (i * Utils::COLUMN_NUMBER + column);
         filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
@@ -56,7 +56,7 @@ uint64_t Rook::getBlockedAttackPattern(const Square &square, const uint64_t &pat
     for (int i = line - 1; i >= 0; --i) {
         const uint64_t nextSquareSet = static_cast<uint64_t>(1) << (i * Utils::COLUMN_NUMBER + column);
         filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
@@ -120,7 +120,7 @@ uint64_t Bishop::getThreatens(const Square &square, const uint64_t &allyPieces) 
     return magicBitboard.bishopMoveTable[square][optimisedIndex];
 }
 
-uint64_t Bishop::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
+uint64_t Bishop::getBlockedAttackPattern(const Square &square, const uint64_t &blockerPattern) const noexcept {
     const uint8_t column = square % Utils::ROW_NUMBER;
     const uint8_t line = square / Utils::COLUMN_NUMBER;
 
@@ -129,28 +129,28 @@ uint64_t Bishop::getBlockedAttackPattern(const Square &square, const uint64_t &p
     for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j++) {
         uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
         filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
     for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i++, j--) {
         uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
         filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
     for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j++) {
         uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
         filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
     for (int i = line, j = column; i < Utils::ROW_NUMBER and j < Utils::COLUMN_NUMBER and j >= 0 and i >= 0; i--, j--) {
         uint64_t nextSquareSet = Utils::setSquare(Square(i * Utils::COLUMN_NUMBER + j));
         filledPattern |= nextSquareSet;
-        if ((nextSquareSet & pattern) != 0) {
+        if ((nextSquareSet & blockerPattern) != 0) {
             break;
         }
     }
@@ -169,6 +169,6 @@ uint64_t Queen::getThreatens(const Square &square, const uint64_t &allyPieces) n
     return Rook::getThreatens(square, allyPieces) | Bishop::getThreatens(square, allyPieces);
 }
 
-uint64_t Queen::getBlockedAttackPattern(const Square &square, const uint64_t &pattern) const noexcept {
-    return Rook{}.getBlockedAttackPattern(square, pattern) | Bishop{}.getBlockedAttackPattern(square, pattern);
+uint64_t Queen::getBlockedAttackPattern(const Square &square, const uint64_t &blockerPattern) const noexcept {
+    return Rook{}.getBlockedAttackPattern(square, blockerPattern) | Bishop{}.getBlockedAttackPattern(square, blockerPattern);
 }

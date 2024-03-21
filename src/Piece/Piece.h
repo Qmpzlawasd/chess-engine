@@ -2,9 +2,7 @@
 #define CHESS_ENGINE_PIECE_H
 
 #include "Colors.h"
-#include "Enums/Squares.h"
-#include "Utils.h"
-#include <array>
+#include <cstdint>
 
 class Piece {
   protected:
