@@ -14,22 +14,22 @@ class LegalMove {
     explicit LegalMove(const Board &_board) noexcept : board{_board} {}
 
     template <Color side>
-    [[nodiscard]] std::vector<Move> getBishopLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getBishopLegalMoves() const noexcept;
 
     template <Color side>
-    [[nodiscard]] std::vector<Move> getRookLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getRookLegalMoves() const noexcept;
 
     template <Color side>
-    [[nodiscard]] std::vector<Move> getPawnLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getPawnLegalMoves() const noexcept;
 
     template <Color side>
-    [[nodiscard]] std::vector<Move> getKnightLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getKnightLegalMoves() const noexcept;
 
     template <Color side>
-    [[nodiscard]] std::vector<Move> getQueenLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getQueenLegalMoves() const noexcept;
 
     template <Color side>
-    [[nodiscard]] std::vector<Move> getKingLegalMove() const noexcept;
+    [[nodiscard]] std::vector<Move> getKingLegalMoves() const noexcept;
 };
 
 #endif // CHESS_ENGINE_LEGALMOVE_H

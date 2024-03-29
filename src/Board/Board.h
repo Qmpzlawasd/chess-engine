@@ -143,8 +143,11 @@ class Board {
                                     checkMask |= Utils::getSetLineBetween(kingSquare, square);
                                     doubleAttacked++;
                                 });
-
-        return doubleAttacked == 2 ? -1 : checkMask; // -1 on double check, 0 no checks
+        // no checks
+        if (!checkMask) {
+            return -1;
+        }
+        return doubleAttacked == 2 ? 0 : checkMask; // 0 on double check
     };
 
   public:

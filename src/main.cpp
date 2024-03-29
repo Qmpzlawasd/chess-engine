@@ -1,16 +1,14 @@
-//#include "Board/Board.h"
 #include "Board/LegalMove.h"
-
 
 int main() {
 
-    const std::string fenString = "3r4/8/3N4/1N6/3K1N1q/8/8/3N4 w - - 0 1";
+    const std::string fenString = "1k5n/2N5/b7/4N1r1/8/8/4K3/8 w - - 0 1";
     Board board{fenString};
     LegalMove legalMove{board};
 
     //    Utils::showBitBoard(board.computeCheckMask<BLACK>());
-//    std::vector<Move> moves = legalMove.getKnightLegalMove<WHITE>();
-//    std::for_each(moves.begin(), moves.end(), [](const Move &move) { std::cout << move; });
+    std::vector<Move> moves = legalMove.getKnightLegalMoves<WHITE>();
+    std::for_each(moves.begin(), moves.end(), [](const Move &move) -> void { std::cout << move; });
 
     // const uint64_t a = board.getPinMaskHV<WHITE>();
     // const uint64_t b = board.getPinMaskD12<WHITE>();

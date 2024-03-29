@@ -1,7 +1,7 @@
 #include "LegalMove.h"
 
 template <Color side>
-std::vector<Move> LegalMove::getKingLegalMove() const noexcept {
+std::vector<Move> LegalMove::getKingLegalMoves() const noexcept {
     std::vector<Move> moves;
 
     uint64_t kingBoard = board.king.getBitboard<side>();
@@ -18,56 +18,56 @@ std::vector<Move> LegalMove::getKingLegalMove() const noexcept {
     return moves;
 }
 
-template std::vector<Move> LegalMove::getKingLegalMove<WHITE>() const noexcept;
-template std::vector<Move> LegalMove::getKingLegalMove<BLACK>() const noexcept;
+template std::vector<Move> LegalMove::getKingLegalMoves<WHITE>() const noexcept;
+template std::vector<Move> LegalMove::getKingLegalMoves<BLACK>() const noexcept;
 
 template <Color side>
-std::vector<Move> LegalMove::getRookLegalMove() const noexcept {
+std::vector<Move> LegalMove::getRookLegalMoves() const noexcept {
     return std::vector<Move>{};
 }
 
-template std::vector<Move> LegalMove::getRookLegalMove<WHITE>() const noexcept;
-template std::vector<Move> LegalMove::getRookLegalMove<BLACK>() const noexcept;
+template std::vector<Move> LegalMove::getRookLegalMoves<WHITE>() const noexcept;
+template std::vector<Move> LegalMove::getRookLegalMoves<BLACK>() const noexcept;
 
 template <Color side>
-std::vector<Move> LegalMove::getPawnLegalMove() const noexcept {
+std::vector<Move> LegalMove::getPawnLegalMoves() const noexcept {
     return std::vector<Move>{};
 }
 
-template std::vector<Move> LegalMove::getPawnLegalMove<WHITE>() const noexcept;
-template std::vector<Move> LegalMove::getPawnLegalMove<BLACK>() const noexcept;
+template std::vector<Move> LegalMove::getPawnLegalMoves<WHITE>() const noexcept;
+template std::vector<Move> LegalMove::getPawnLegalMoves<BLACK>() const noexcept;
 
 template <Color side>
-std::vector<Move> LegalMove::getQueenLegalMove() const noexcept {
+std::vector<Move> LegalMove::getQueenLegalMoves() const noexcept {
     return std::vector<Move>{};
 }
 
-template std::vector<Move> LegalMove::getQueenLegalMove<WHITE>() const noexcept;
-template std::vector<Move> LegalMove::getQueenLegalMove<BLACK>() const noexcept;
+template std::vector<Move> LegalMove::getQueenLegalMoves<WHITE>() const noexcept;
+template std::vector<Move> LegalMove::getQueenLegalMoves<BLACK>() const noexcept;
 
 template <Color side>
-std::vector<Move> LegalMove::getKnightLegalMove() const noexcept {
+std::vector<Move> LegalMove::getKnightLegalMoves() const noexcept {
     std::vector<Move> moves;
-    const uint64_t freeKnights = board.knights.getBitboard<side>() ^ (board.getPinnedMaskD12<side>() | board.getPinnedMaskHV<side>());
+    const uint64_t freeKnights = board.knights.getBitboard<side>() ^ ( board.knights.getBitboard<side>() & (board.getPinnedMaskD12<side>() | board.getPinnedMaskHV<side>()));
     Utils::showBitBoard(freeKnights);
     MoveBuilder moveBuilder = MoveBuilder{};
 
     Utils::runForEachSetBit(freeKnights, [&moveBuilder, this, &moves](const Square &originSquare) -> void {
         Utils::runForEachSetBit(Knight::getMoves(originSquare) & ~board.getOccupiedSquares<side>() & board.getCheckMask<side>(),
                                 [&moveBuilder, &originSquare, &moves](const Square &legalSquare) -> void {
-                                    moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(legalSquare).getMove());
+                                    moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(legalSquare).withKnight().getMove());
                                 });
     });
     return moves;
 }
 
-template std::vector<Move> LegalMove::getKnightLegalMove<WHITE>() const noexcept;
-template std::vector<Move> LegalMove::getKnightLegalMove<BLACK>() const noexcept;
+template std::vector<Move> LegalMove::getKnightLegalMoves<WHITE>() const noexcept;
+template std::vector<Move> LegalMove::getKnightLegalMoves<BLACK>() const noexcept;
 
 template <Color side>
-std::vector<Move> LegalMove::getBishopLegalMove() const noexcept {
+std::vector<Move> LegalMove::getBishopLegalMoves() const noexcept {
     return std::vector<Move>{};
 }
 
-template std::vector<Move> LegalMove::getBishopLegalMove<WHITE>() const noexcept;
-template std::vector<Move> LegalMove::getBishopLegalMove<BLACK>() const noexcept;
+template std::vector<Move> LegalMove::getBishopLegalMoves<WHITE>() const noexcept;
+template std::vector<Move> LegalMove::getBishopLegalMoves<BLACK>() const noexcept;
