@@ -13,7 +13,8 @@ class MagicBitboard {
     const std::vector<std::vector<uint64_t>> bishopMoveTable;
 
     explicit MagicBitboard(const std::shared_ptr<MagicValuesGeneratorInterface> &_magicGenerator)
-        : magicGenerator{_magicGenerator}, rookMoveTable{_magicGenerator->getTables(Rook::MAGIC_CONSTANTS, Rook{})},
+        : magicGenerator{_magicGenerator}, 
+          rookMoveTable{_magicGenerator->getTables(Rook::MAGIC_CONSTANTS, Rook{})},
           bishopMoveTable{_magicGenerator->getTables(Bishop::MAGIC_CONSTANTS, Bishop{})} {};
 };
 

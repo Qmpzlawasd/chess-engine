@@ -1,18 +1,21 @@
 //#include "Board/Board.h"
 #include "Board/LegalMove.h"
 
+
 int main() {
-    // implement pins
-    const std::string asd = "q5b1/1R6/4P3/q1BK1B1r/8/8/2k5/6R1 w - - 0 1";
-    Board board{asd};
+
+    const std::string fenString = "3r4/8/3N4/1N6/3K1N1q/8/8/3N4 w - - 0 1";
+    Board board{fenString};
     LegalMove legalMove{board};
-    const uint64_t a = board.getPinMaskHV<WHITE>();
-    const uint64_t b = board.getPinMaskD12<WHITE>();
-    Utils::showBitBoard(a);
-    Utils::showBitBoard(b);
-//        std::for_each(legalMove.getKingLegalMove<WHITE>().begin(), legalMove.getKingLegalMove<WHITE>().end(), [](const Move &move) {
-//            std::cout << move;
-//        });
+
+    //    Utils::showBitBoard(board.computeCheckMask<BLACK>());
+//    std::vector<Move> moves = legalMove.getKnightLegalMove<WHITE>();
+//    std::for_each(moves.begin(), moves.end(), [](const Move &move) { std::cout << move; });
+
+    // const uint64_t a = board.getPinMaskHV<WHITE>();
+    // const uint64_t b = board.getPinMaskD12<WHITE>();
+    // Utils::showBitBoard(a);
+    // Utils::showBitBoard(b);
 
     //    Utils::showBitBoard(board.isSquareAttacked<WHITE>(E3));
 

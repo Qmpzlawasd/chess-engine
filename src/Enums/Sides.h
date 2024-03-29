@@ -1,9 +1,6 @@
 #ifndef CHESS_ENGINE_SIDES_H
 #define CHESS_ENGINE_SIDES_H
 
-enum Side {
-    QUEEN_SIDE,
-    KING_SIDE
-};
+enum Side { QUEEN_SIDE, KING_SIDE };
 
 #endif // CHESS_ENGINE_SIDES_H

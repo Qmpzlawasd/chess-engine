@@ -1,6 +1,6 @@
 #include "FEN.h"
 #include "Castle.h"
-#include "Colors.h"
+#include "Enums/Colors.h"
 #include "Utils.h"
 
 Color FEN::parseTurn(const std::string &fen) {
@@ -84,8 +84,8 @@ uint64_t FEN::parsePiece(const std::string &fen, const char &piece) {
             ++slashesMet;
             columnIndex = 0;
         } else if (ch == piece) {
-            const uint64_t formula = (uint64_t)1 << (Utils::COLUMN_NUMBER * Utils::ROW_NUMBER - slashesMet * Utils::ROW_NUMBER -
-                                                     (Utils::ROW_NUMBER - columnIndex));
+            const uint64_t formula = static_cast<uint64_t>(1) << (Utils::COLUMN_NUMBER * Utils::ROW_NUMBER -
+                                                                  slashesMet * Utils::ROW_NUMBER - (Utils::ROW_NUMBER - columnIndex));
             bitboard |= formula;
             ++columnIndex;
         } else if (std::isdigit(ch)) {

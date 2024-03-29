@@ -1,8 +1,8 @@
 #ifndef CHESS_ENGINE_FEN_H
 #define CHESS_ENGINE_FEN_H
 
-#include "Colors.h"
 #include "Castle.h"
+#include "Enums/Colors.h"
 #include <iostream>
 #include <thread>
 #include <vector>

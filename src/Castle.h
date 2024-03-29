@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Enums/Sides.h"
+#include "Enums/Colors.h"
 #include "Enums/Squares.h"
 
 #include <cstdint>

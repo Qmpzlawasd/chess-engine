@@ -1,6 +1,6 @@
 #include "JumpingPiece.h"
 
-[[nodiscard]] uint64_t King::getMoves(const Square &square) noexcept {
+uint64_t King::getMoves(const Square &square) noexcept {
     const uint64_t pieceBitboard = Utils::setSquare(square);
 
     const uint64_t attackLeft = (pieceBitboard & ~Utils::A_FILE) >> 1;
@@ -17,7 +17,7 @@
     return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown);
 }
 
-[[nodiscard]] uint64_t King::getMoves(const uint64_t &pieceBitboard) noexcept {
+uint64_t King::getMoves(const uint64_t &pieceBitboard) noexcept {
     const uint64_t attackLeft = (pieceBitboard & ~Utils::A_FILE) >> 1;
     const uint64_t attackRight = (pieceBitboard & ~Utils::H_FILE) << 1;
 
@@ -32,7 +32,7 @@
     return (attackLeftUp | attackLeftDown | attackRightUp | attackRightDown | attackLeft | attackRight | attackUp | attackDown);
 }
 
-[[nodiscard]] uint64_t Knight::getMoves(const Square &square) noexcept {
+uint64_t Knight::getMoves(const Square &square) noexcept {
     const uint64_t pieceBitboard = Utils::setSquare(square);
 
     constexpr uint64_t B_FILE = Utils::A_FILE << 1;

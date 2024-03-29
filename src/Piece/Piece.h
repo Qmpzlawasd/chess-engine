@@ -1,7 +1,7 @@
 #ifndef CHESS_ENGINE_PIECE_H
 #define CHESS_ENGINE_PIECE_H
 
-#include "Colors.h"
+#include "Enums/Colors.h"
 #include <cstdint>
 
 class Piece {

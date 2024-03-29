@@ -59,7 +59,7 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
         for (uint8_t i = start; i < Utils::NUMBER_SQUARES_TABLE; i++) {
             searchThreads.emplace_back(&MagicValuesParallelGenerator::getMagicNumber,
                                        MagicValuesParallelGenerator{},
-                                       (Square)i,
+                                       static_cast<Square>(i),
                                        std::ref(slidingPiece));
         }
         std::for_each(searchThreads.begin(), searchThreads.end(), [](std::thread &thread) -> void { thread.join(); });
@@ -74,15 +74,15 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
                                                                const SlidingPiece &slidingPiece) const noexcept override {
 
         const uint64_t tableSize = 1 << (Utils::NUMBER_SQUARES_TABLE - slidingPiece.getShiftValue());
-        std::vector<std::vector<uint64_t>> bitboard(Utils::NUMBER_SQUARES_TABLE, std::vector<uint64_t>(tableSize, -1));
+        std::vector<std::vector<uint64_t>> bitboard(Utils::NUMBER_SQUARES_TABLE, std::vector<uint64_t>(tableSize, 123456789));
 
         for (uint8_t square = 0; square < Utils::NUMBER_SQUARES_TABLE; square++) {
             tryMagicNumber(magicValues[square],
-                           Square(square),
+                           static_cast<Square>(square),
                            slidingPiece,
                            [&bitboard, &square, &slidingPiece](const uint64_t &key, const uint64_t &subset) noexcept -> bool {
-                               assert(bitboard[square][key] == (uint64_t)-1);
-                               bitboard[square][key] = slidingPiece.getBlockedAttackPattern((const Square)square, subset);
+                               assert(bitboard[square][key] == 123456789);
+                               bitboard[square][key] = slidingPiece.getBlockedAttackPattern(static_cast<const Square>(square), subset);
                                return true;
                            });
         }

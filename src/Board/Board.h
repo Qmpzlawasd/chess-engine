@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <iostream>
 
-#include "Colors.h"
+#include "Enums/Colors.h"
 #include "Enums/Squares.h"
 #include "FEN.h"
 #include "MagicBitboard.h"
@@ -21,6 +21,13 @@ class Board {
     friend class LegalMove;
 
   public:
+    template <Color side>
+    [[nodiscard]] uint64_t getPinnedMaskHV() const;
+    template <Color side>
+    [[nodiscard]] uint64_t getPinnedMaskD12() const;
+    template <Color side>
+    [[nodiscard]] uint64_t getCheckMask() const;
+
     King king;
     Queen queens;
     Rook rooks;
@@ -37,6 +44,17 @@ class Board {
     uint8_t halfmoveClock;
     uint16_t fullmoveNumber;
 
+  private:
+    uint64_t pinnedMaskHVWhite;
+    uint64_t pinnedMaskHVBlack;
+    uint64_t pinnedMaskD12White;
+    uint64_t pinnedMaskD12Black;
+    uint64_t checkMaskWhite;
+    uint64_t checkMaskBlack;
+    uint64_t dangerTableWhite;
+    uint64_t dangerTableBlack;
+
+  public:
     template <Color side>
     [[nodiscard]] uint64_t getOccupiedSquares() const;
 
@@ -97,13 +115,37 @@ class Board {
     [[nodiscard]] uint64_t bishopAttacksSquare(const Square &) const;
 
     template <Color side>
-    [[nodiscard]] uint64_t getPinMaskHV() const;
+    [[nodiscard]] uint64_t computePinMaskHV() const;
 
     template <Color side>
-    [[nodiscard]] uint64_t getPinMaskD12() const;
+    [[nodiscard]] uint64_t computePinMaskD12() const;
 
     template <Color side>
-    [[nodiscard]] uint64_t getDangerTable() const;
+    [[nodiscard]] uint64_t computeDangerTable() const;
+
+    template <Color side>
+    [[nodiscard]] uint64_t computeCheckMask() const {
+
+        uint64_t kingBoard = king.getBitboard<side>();
+        const Square kingSquare = Utils::popLSB(kingBoard);
+
+        uint64_t checkMask = 0;
+        if (uint64_t pawn = pawnAttacksSquare<side>(kingSquare)) {
+            checkMask |= pawn;
+        } else {
+            checkMask |= knightAttacksSquare<side>(kingSquare);
+        }
+        uint8_t doubleAttacked = checkMask != 0;
+
+        Utils::runForEachSetBit(bishopAttacksSquare<side>(kingSquare) | queenAttacksSquare<side>(kingSquare) |
+                                    rookAttacksSquare<side>(kingSquare),
+                                [&kingSquare, &checkMask, &doubleAttacked](const Square &square) -> void {
+                                    checkMask |= Utils::getSetLineBetween(kingSquare, square);
+                                    doubleAttacked++;
+                                });
+
+        return doubleAttacked == 2 ? -1 : checkMask; // -1 on double check, 0 no checks
+    };
 
   public:
     explicit Board(const std::string &fen = "1nbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -111,8 +153,11 @@ class Board {
           rooks{FEN::parsePiece(fen, 'R'), FEN::parsePiece(fen, 'r')}, bishops{FEN::parsePiece(fen, 'B'), FEN::parsePiece(fen, 'b')},
           knights{FEN::parsePiece(fen, 'N'), FEN::parsePiece(fen, 'n')}, pawns{FEN::parsePiece(fen, 'P'), FEN::parsePiece(fen, 'p')},
           turn{FEN::parseTurn(fen)}, castleWhite{FEN::parseCastle<WHITE>(fen)}, castleBlack{FEN::parseCastle<BLACK>(fen)},
-          enPassant{FEN::parseEnPassant(fen)}, halfmoveClock{FEN::parseHalfmoveClock(fen)},
-          fullmoveNumber{FEN::parseFullmoveNumber(fen)} {};
+          enPassant{FEN::parseEnPassant(fen)}, halfmoveClock{FEN::parseHalfmoveClock(fen)}, fullmoveNumber{FEN::parseFullmoveNumber(fen)},
+          pinnedMaskHVWhite{computePinMaskHV<WHITE>()}, pinnedMaskHVBlack{computePinMaskHV<BLACK>()},
+          pinnedMaskD12White{computePinMaskD12<WHITE>()}, pinnedMaskD12Black{computePinMaskD12<BLACK>()},
+          checkMaskWhite{computeCheckMask<WHITE>()}, checkMaskBlack{computeCheckMask<BLACK>()},
+          dangerTableWhite{computeDangerTable<WHITE>()}, dangerTableBlack{computeDangerTable<BLACK>()} {};
 
     ~Board() = default;
 
@@ -122,5 +167,7 @@ class Board {
         return os;
     }
 };
+
+#include "Board.inl"
 
 #endif // CHESS_ENGINE_BOARD_H

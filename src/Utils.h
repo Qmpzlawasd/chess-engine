@@ -1,15 +1,13 @@
 #ifndef CHESS_ENGINE_UTILS_H
 #define CHESS_ENGINE_UTILS_H
 
-#include "Colors.h"
-#include "Colors.h"
+#include "Enums/Colors.h"
 #include "Enums/Squares.h"
 
 #include <functional>
 #include <iostream>
 #include <thread>
 #include <x86gprintrin.h>
-
 class Utils {
     static void showReversedBin(int8_t);
 
@@ -69,6 +67,8 @@ class Utils {
     static uint64_t getIthRank(const uint64_t &, const int &);
 
     static uint64_t getSetLineBetween(const Square &, const Square &);
+
+    static uint64_t getCheckLineBetween(const Square &, const Square &);
 };
 
 #endif // CHESS_ENGINE_UTILS_H

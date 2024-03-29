@@ -9,7 +9,7 @@ class MoveBuilder {
 
 
   public:
-    explicit MoveBuilder();
+    explicit MoveBuilder() : move(0) {};
 
     MoveBuilder &toSquare(const Square &);
 
@@ -39,4 +39,5 @@ class MoveBuilder {
 
     Move getMove();
 };
+
 #endif // CHESS_ENGINE_MOVEBUILDER_H
