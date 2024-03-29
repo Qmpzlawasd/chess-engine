@@ -32,4 +32,6 @@ class LegalMove {
     [[nodiscard]] std::vector<Move> getKingLegalMoves() const noexcept;
 };
 
+#include "LegalMove.inl"
+
 #endif // CHESS_ENGINE_LEGALMOVE_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CHESS_ENGINE_MAGICVALUESPARALLELGENERATOR_H
+#define CHESS_ENGINE_MAGICVALUESPARALLELGENERATOR_H
 
 #include "Enums/Squares.h"
 #include "MagicBitboard.h"
@@ -89,3 +90,5 @@ class MagicValuesParallelGenerator : public MagicValuesGeneratorInterface {
         return bitboard;
     }
 };
+
+#endif // CHESS_ENGINE_MAGICVALUESPARALLELGENERATOR_H

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CHESS_ENGINE_CASTLE_H
+#define CHESS_ENGINE_CASTLE_H
+
 
 #include "Enums/Sides.h"
 #include "Enums/Colors.h"
@@ -38,3 +40,5 @@ class Castle {
         return kingSideRook;
     }
 };
+
+#endif // CHESS_ENGINE_CASTLE_H

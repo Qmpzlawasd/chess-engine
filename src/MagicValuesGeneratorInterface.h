@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CHESS_ENGINE_MAGICVALUESGENERATORINTERFACE_H
+#define CHESS_ENGINE_MAGICVALUESGENERATORINTERFACE_H
 
 #include "Piece/SlidingPiece.h"
 
@@ -11,3 +12,5 @@ class MagicValuesGeneratorInterface {
 
     virtual ~MagicValuesGeneratorInterface() = default;
 };
+
+#endif // CHESS_ENGINE_MAGICVALUESGENERATORINTERFACE_H

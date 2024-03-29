@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CHESS_ENGINE_MAGICBITBOARD_H
+#define CHESS_ENGINE_MAGICBITBOARD_H
+
 
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
@@ -19,3 +21,5 @@ class MagicBitboard {
 };
 
 static const MagicBitboard magicBitboard{std::make_shared<MagicValuesParallelGenerator>(MagicValuesParallelGenerator{})};
+
+#endif // CHESS_ENGINE_MAGICBITBOARD_H

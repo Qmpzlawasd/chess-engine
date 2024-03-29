@@ -1,3 +1,6 @@
+#ifndef CHESS_ENGINE_BOARD_INL
+#define CHESS_ENGINE_BOARD_INL
+
 #include "../Enums/Colors.h"
 #include "../Enums/Sides.h"
 #include "../Piece/JumpingPiece.h"
@@ -196,3 +199,4 @@ uint64_t Board::computePinMaskD12() const {
 
     return pinnedHV;
 }
+#endif // CHESS_ENGINE_BOARD_INL
