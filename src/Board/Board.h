@@ -124,31 +124,7 @@ class Board {
     [[nodiscard]] uint64_t computeDangerTable() const;
 
     template <Color side>
-    [[nodiscard]] uint64_t computeCheckMask() const {
-
-        uint64_t kingBoard = king.getBitboard<side>();
-        const Square kingSquare = Utils::popLSB(kingBoard);
-
-        uint64_t checkMask = 0;
-        if (uint64_t pawn = pawnAttacksSquare<side>(kingSquare)) {
-            checkMask |= pawn;
-        } else {
-            checkMask |= knightAttacksSquare<side>(kingSquare);
-        }
-        uint8_t doubleAttacked = checkMask != 0;
-
-        Utils::runForEachSetBit(bishopAttacksSquare<side>(kingSquare) | queenAttacksSquare<side>(kingSquare) |
-                                    rookAttacksSquare<side>(kingSquare),
-                                [&kingSquare, &checkMask, &doubleAttacked](const Square &square) -> void {
-                                    checkMask |= Utils::getSetLineBetween(kingSquare, square);
-                                    doubleAttacked++;
-                                });
-        // no checks
-        if (!checkMask) {
-            return -1;
-        }
-        return doubleAttacked == 2 ? 0 : checkMask; // 0 on double check
-    };
+    [[nodiscard]] uint64_t computeCheckMask() const;
 
   public:
     explicit Board(const std::string &fen = "1nbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")

@@ -5,12 +5,20 @@ template <Color side>
     const uint64_t pieceBitboard = Utils::setSquare(square);
 
     if constexpr (side == WHITE) {
-        constexpr uint64_t SECOND_ROW = Utils::FIRST_ROW << Utils::ROW_NUMBER;
-        return (pieceBitboard << Utils::ROW_NUMBER | (pieceBitboard & SECOND_ROW) << Utils::ROW_NUMBER * 2) & emptySquares;
+        constexpr uint64_t THIRD_ROW = Utils::FIRST_ROW << Utils::ROW_NUMBER << Utils::ROW_NUMBER;
+
+        const uint64_t basicAttack = (pieceBitboard << Utils::ROW_NUMBER) & emptySquares;
+        const uint64_t setDoublePush = (basicAttack & THIRD_ROW) << Utils::ROW_NUMBER & emptySquares;
+
+        return basicAttack ^ setDoublePush;
     } else {
         // move orientations are reversed
-        constexpr uint64_t SECOND_TO_LAST_ROW = Utils::FIRST_ROW << (Utils::COLUMN_NUMBER * (Utils::COLUMN_NUMBER - 2));
-        return (pieceBitboard >> Utils::ROW_NUMBER | (pieceBitboard & SECOND_TO_LAST_ROW) >> Utils::ROW_NUMBER * 2) & emptySquares;
+        constexpr uint64_t THIRD_TO_LAST_ROW = Utils::FIRST_ROW << (Utils::COLUMN_NUMBER * (Utils::COLUMN_NUMBER - 3));
+
+        const uint64_t basicAttack = (pieceBitboard >> Utils::ROW_NUMBER) & emptySquares;
+        const uint64_t setDoublePush = (basicAttack & THIRD_TO_LAST_ROW) >> Utils::ROW_NUMBER & emptySquares;
+
+        return basicAttack ^ setDoublePush;
     }
 }
 
