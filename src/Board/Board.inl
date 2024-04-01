@@ -101,8 +101,7 @@ uint64_t Board::queenAttacksSquare(const Square &square) const {
     const uint64_t enemyQueen = queens.getBitboard<Utils::flipColor(side)>();
     const uint64_t originQueenAttack = Rook::getMoves(square, getEmptySquares()) | Bishop::getMoves(square, getEmptySquares());
 
-    return originQueenAttack & enemyQueen;
-}
+    return originQueenAttack & enemyQueen;}
 
 template <Color side>
 uint64_t Board::rookAttacksSquare(const Square &square) const {
