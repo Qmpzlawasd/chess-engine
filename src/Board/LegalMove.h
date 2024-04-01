@@ -9,8 +9,11 @@
 
 class LegalMove {
     Board board;
-
   public:
+
+    template <Color side>
+    [[nodiscard]] bool handlePawnShenanigans()  noexcept;
+
     explicit LegalMove(const Board &_board) noexcept : board{_board} {}
 
     template <Color side>

@@ -2,6 +2,7 @@
 #define CHESS_ENGINE_PIECE_H
 
 #include "Enums/Colors.h"
+#include "Utils.h"
 #include <cstdint>
 
 class Piece {
@@ -21,6 +22,14 @@ class Piece {
             return whitePieces;
         }
         return blackPieces;
+    }
+
+    template <Color side>
+    void flipSquare(const Square &square) noexcept {
+        if constexpr (side == WHITE) {
+            whitePieces ^= Utils::setSquare(square);
+        }
+        blackPieces ^= Utils::setSquare(square);
     }
 
     virtual ~Piece() = default;
