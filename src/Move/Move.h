@@ -1,12 +1,12 @@
 #ifndef CHESS_ENGINE_MOVE_H
 #define CHESS_ENGINE_MOVE_H
-#include "Enums/Squares.h"
-#include "Utils.h"
+
+#include "../Board/Board.h"
+#include "../Enums/Squares.h"
+#include "../Utils.h"
+
 #include <cstdint>
 #include <fstream>
-#include <iostream>
-#include <thread>
-#include <unordered_map>
 #include <vector>
 
 class Move {
@@ -19,8 +19,49 @@ class Move {
      */
     uint16_t move;
 
+  protected:
+    template <Color side>
+    void makeCapture(Board &board, const uint64_t &capture) noexcept {
+        if (board.queens.getBitboard<side>() & capture) {
+            board.queens.flipSquare<side>(Utils::popLSBCopy(capture));
+        } else if (board.rooks.getBitboard<side>() & capture) {
+            board.rooks.flipSquare<side>(Utils::popLSBCopy(capture));
+        } else if (board.pawns.getBitboard<side>() & capture) {
+            board.pawns.flipSquare<side>(Utils::popLSBCopy(capture));
+        } else if (board.knights.getBitboard<side>() & capture) {
+            board.knights.flipSquare<side>(Utils::popLSBCopy(capture));
+        } else if (board.king.getBitboard<side>() & capture) {
+            board.king.flipSquare<side>(Utils::popLSBCopy(capture));
+        } else if (board.bishops.getBitboard<side>() & capture) {
+            board.bishops.flipSquare<side>(Utils::popLSBCopy(capture));
+        } else {
+            puts("*PANIC, MOVE DOES NOT EXIST*");
+            std::cout << move;
+            puts("****************************");
+        }
+    }
+
   public:
     explicit Move(uint16_t _move = 0) : move{_move} {};
+    virtual void makeMove(Board &board) noexcept { // call la final
+        board.halfmoveClock++;
+
+        if (board.turn == BLACK) {
+            board.fullmoveNumber++;
+            board.turn = WHITE;
+            board.pinnedMaskHVWhite = board.computePinMaskHV<WHITE>();
+            board.pinnedMaskD12White = board.computePinMaskD12<WHITE>();
+            board.checkMaskWhite = board.computeCheckMask<WHITE>();
+            board.dangerTableWhite = board.computeDangerTable<WHITE>();
+
+        } else {
+            board.turn = BLACK;
+            board.pinnedMaskHVBlack = board.computePinMaskHV<BLACK>();
+            board.pinnedMaskD12Black = board.computePinMaskD12<BLACK>();
+            board.checkMaskBlack = board.computeCheckMask<BLACK>();
+            board.dangerTableBlack = board.computeDangerTable<BLACK>();
+        }
+    }
 
     void setToSquare(const Square &toSquare) { Move::move = Move::move | uint16_t(toSquare) << 0xA; }
 
@@ -62,11 +103,19 @@ class Move {
 
     [[nodiscard]] bool isPromotion() const { return move & 0x8; }
 
+    [[nodiscard]] bool isDoublePush() const { return move & 0x1; }
+
+    [[nodiscard]] bool isKingSideCastle() const { return move & 0x2; }
+
+    [[nodiscard]] bool isQueenSideCastle() const { return move & 0x3; }
+
     friend std::ostream &operator<<(std::ostream &os, const Move &_move) {
-        os << static_cast<int>(_move.getFrom()) << "->" << static_cast<int>(_move.getTo()) << " " << static_cast<int>(_move.getFlags())
-           << '\n';
+
+        os << Utils::squareToString(static_cast<Square>(_move.getFrom())) << "->"
+           << Utils::squareToString(static_cast<Square>(_move.getTo())) << " " << static_cast<int>(_move.getFlags()) << '\n';
         return os;
     }
+    virtual ~Move() = default;
 };
 
 #endif // CHESS_ENGINE_MOVE_H

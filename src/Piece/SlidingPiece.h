@@ -5,9 +5,9 @@
 #include "Enums/Squares.h"
 #include "Piece.h"
 
+#include <array>
 #include <cstdint>
 #include <vector>
-#include <array>
 
 class SlidingPiece : public Piece {
   public:

@@ -10,7 +10,6 @@
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
 #include "MagicValuesParallelGenerator.h"
-#include "Move/MoveBuilder.h"
 #include "Piece/JumpingPiece.h"
 #include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
@@ -19,6 +18,7 @@
 
 class Board {
     friend class LegalMove;
+    friend class Move;
 
   public:
     template <Color side>
@@ -55,6 +55,10 @@ class Board {
     uint64_t dangerTableBlack;
 
   public:
+    void resetEnPassant() noexcept { enPassant = 0; };
+
+    void setEnPassant(const uint64_t &enapassant) noexcept { enPassant = enapassant; };
+
     template <Color side>
     [[nodiscard]] uint64_t getOccupiedSquares() const;
 

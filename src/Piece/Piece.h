@@ -28,8 +28,9 @@ class Piece {
     void flipSquare(const Square &square) noexcept {
         if constexpr (side == WHITE) {
             whitePieces ^= Utils::setSquare(square);
+        } else {
+            blackPieces ^= Utils::setSquare(square);
         }
-        blackPieces ^= Utils::setSquare(square);
     }
 
     virtual ~Piece() = default;

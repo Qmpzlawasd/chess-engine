@@ -53,17 +53,18 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
     uint64_t emptySquares = getEmptySquares();
     if constexpr (side == WHITE) {
         if (castleWhite.hasRookMoved<QUEEN_SIDE>()) {
-            if (emptySquares & Utils::setSquare(B1) && emptySquares & Utils::setSquare(C1) && emptySquares & Utils::setSquare(D1)) {
-                if (!isSquareAttacked<side>(C1) && !isSquareAttacked<side>(D1)) {
-                    castleBoard |= Utils::setSquare(C1);
+            if (emptySquares & Utils::setSquare(B1) && emptySquares & Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_WHITE) &&
+                emptySquares & Utils::setSquare(D1)) {
+                if (!isSquareAttacked<side>(Utils::QUEEN_SIDE_CASTLE_WHITE) && !isSquareAttacked<side>(D1)) {
+                    castleBoard |= Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_WHITE);
                 }
             }
         }
 
         if (castleWhite.hasRookMoved<KING_SIDE>()) {
-            if (emptySquares & Utils::setSquare(F1) && emptySquares & Utils::setSquare(G1)) {
-                if (!isSquareAttacked<side>(F1) && !isSquareAttacked<side>(G1)) {
-                    castleBoard |= Utils::setSquare(G1);
+            if (emptySquares & Utils::setSquare(F1) && emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_WHITE)) {
+                if (!isSquareAttacked<side>(F1) && !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_WHITE)) {
+                    castleBoard |= Utils::setSquare(Utils::KING_SIDE_CASTLE_WHITE);
                 }
             }
         }
@@ -71,17 +72,18 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
     } else {
         if (castleBlack.hasRookMoved<QUEEN_SIDE>()) {
             if (!castleWhite.hasRookMoved<QUEEN_SIDE>()) {
-                if (emptySquares & Utils::setSquare(B8) && emptySquares & Utils::setSquare(C8) && emptySquares & Utils::setSquare(D8)) {
-                    if (!isSquareAttacked<side>(C8) && !isSquareAttacked<side>(D8)) {
-                        castleBoard |= Utils::setSquare(C8);
+                if (emptySquares & Utils::setSquare(B8) && emptySquares & Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_BLACK) &&
+                    emptySquares & Utils::setSquare(D8)) {
+                    if (!isSquareAttacked<side>(Utils::QUEEN_SIDE_CASTLE_BLACK) && !isSquareAttacked<side>(D8)) {
+                        castleBoard |= Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_BLACK);
                     }
                 }
             }
 
             if (castleBlack.hasRookMoved<KING_SIDE>()) {
-                if (emptySquares & Utils::setSquare(F8) && emptySquares & Utils::setSquare(G8)) {
-                    if (!isSquareAttacked<side>(F8) && !isSquareAttacked<side>(G8)) {
-                        castleBoard |= Utils::setSquare(G8);
+                if (emptySquares & Utils::setSquare(F8) && emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK)) {
+                    if (!isSquareAttacked<side>(F8) && !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_BLACK)) {
+                        castleBoard |= Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK);
                     }
                 }
             }
@@ -92,7 +94,7 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
 
 template <Color side>
 uint64_t Board::isSquareAttacked(const Square &square) const {
-    return rookAttacksSquare<side>(square) | bishopAttacksSquare<side>(square) | pawnAttacksSquare<side>(square) |
+    return rookAttacksSquare<side>(square) | bishopAttacksSquare<BLACK>(square) | pawnAttacksSquare<side>(square) |
            kingAttacksSquare<side>(square) | queenAttacksSquare<side>(square) | knightAttacksSquare<side>(square);
 }
 
@@ -101,7 +103,8 @@ uint64_t Board::queenAttacksSquare(const Square &square) const {
     const uint64_t enemyQueen = queens.getBitboard<Utils::flipColor(side)>();
     const uint64_t originQueenAttack = Rook::getMoves(square, getEmptySquares()) | Bishop::getMoves(square, getEmptySquares());
 
-    return originQueenAttack & enemyQueen;}
+    return originQueenAttack & enemyQueen;
+}
 
 template <Color side>
 uint64_t Board::rookAttacksSquare(const Square &square) const {
@@ -221,7 +224,7 @@ template <Color side>
                             });
     // no checks
     if (!checkMask) {
-        return -1;
+        return std::numeric_limits<uint64_t>::max();
     }
     return doubleAttacked == 2 ? 0 : checkMask; // 0 on double check
 }

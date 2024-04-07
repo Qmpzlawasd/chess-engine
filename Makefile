@@ -14,7 +14,7 @@ ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $
 
 .PHONY: pre-build all engine engine-debug run
 
-debug: pre-build engine-debug run
+warning: pre-build engine-debug run
 
 all: pre-build engine run
 

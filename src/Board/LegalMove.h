@@ -1,6 +1,7 @@
 #ifndef CHESS_ENGINE_LEGALMOVE_H
 #define CHESS_ENGINE_LEGALMOVE_H
 
+#include "../Move/Move.h"
 #include "../Piece/JumpingPiece.h"
 #include "Board.h"
 #include "Enums/Colors.h"
@@ -9,12 +10,15 @@
 
 class LegalMove {
     Board board;
-  public:
 
+  public:
     template <Color side>
-    [[nodiscard]] bool handlePawnShenanigans()  noexcept;
+    [[nodiscard]] bool handlePawnShenanigans(const Square &) noexcept;
 
     explicit LegalMove(const Board &_board) noexcept : board{_board} {}
+
+    template <Color side>
+    [[nodiscard]] std::vector<Move> getLegalMoves() noexcept;
 
     template <Color side>
     [[nodiscard]] std::vector<Move> getBishopLegalMoves() const noexcept;
@@ -23,7 +27,7 @@ class LegalMove {
     [[nodiscard]] std::vector<Move> getRookLegalMoves() const noexcept;
 
     template <Color side>
-    [[nodiscard]] std::vector<Move> getPawnLegalMoves() const noexcept;
+    [[nodiscard]] std::vector<Move> getPawnLegalMoves() noexcept;
 
     template <Color side>
     [[nodiscard]] std::vector<Move> getKnightLegalMoves() const noexcept;
