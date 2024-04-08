@@ -4,17 +4,23 @@
 #include "Move.h"
 
 class QueenMove : public Move {
+  public:
+    QueenMove(const Move &move) : Move(move){};
+
     virtual void makeMove(Board &board) noexcept override {
-        const Square fromSquare = static_cast<const Square>(this->getFrom());
-        const Square toSquare = static_cast<const Square>(this->getTo());
+        const auto fromSquare = static_cast<const Square>(this->getFrom());
+        const auto toSquare = static_cast<const Square>(this->getTo());
+
         if (board.turn == WHITE) {
+            Move::makeCapture<WHITE>(board, toSquare);
+
             board.queens.flipSquare<WHITE>(fromSquare);
-            Move::makeCapture<WHITE>(board, Utils::setSquare(toSquare) & board.getOccupiedSquares<BLACK>());
             board.queens.flipSquare<WHITE>(toSquare);
 
         } else {
+            Move::makeCapture<BLACK>(board, toSquare);
+
             board.queens.flipSquare<BLACK>(fromSquare);
-            Move::makeCapture<BLACK>(board, Utils::setSquare(toSquare) & board.getOccupiedSquares<BLACK>());
             board.queens.flipSquare<BLACK>(toSquare);
         }
 

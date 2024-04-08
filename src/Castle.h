@@ -24,6 +24,15 @@ class Castle {
         return kingSideRook;
     }
 
+    template <Side area>
+    void rookMoved() noexcept {
+        if constexpr (area == QUEEN_SIDE) {
+            queenSideRook = false;
+        } else {
+            kingSideRook = false;
+        }
+    }
+
     void kingMoved() noexcept {
         queenSideRook = false;
         kingSideRook = false;

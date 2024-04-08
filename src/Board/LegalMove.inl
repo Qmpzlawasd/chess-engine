@@ -3,19 +3,38 @@
 
 #include "../Move/MoveBuilder.h"
 #include "LegalMove.h"
+#include "Move/BishopMove.h"
+#include "Move/KingMove.h"
 #include "Move/Move.h"
+#include "Move/PawnMove.h"
+#include "Move/QueenMove.h"
+#include "Move/RookMove.h"
 
 template <Color side>
-[[nodiscard]] std::vector<Move> LegalMove::getLegalMoves() noexcept {
-    std::vector<Move> allMoves;
-    std::vector<Move> rook = getRookLegalMoves<side>();
-    std::vector<Move> queen = getQueenLegalMoves<side>();
-    std::vector<Move> knight = getKnightLegalMoves<side>();
-    std::vector<Move> bishop = getBishopLegalMoves<side>();
-    std::vector<Move> king = getKingLegalMoves<side>();
-    std::vector<Move> pawn = getPawnLegalMoves<side>();
+[[nodiscard]] std::optional<std::vector<std::shared_ptr<Move>>> LegalMove::getLegalMoves() noexcept {
+    if (board.status != TBA)
+        return {};
 
-    allMoves.reserve(rook.size() + queen.size() + bishop.size() + king.size() + pawn.size() + knight.size());
+    std::vector<std::shared_ptr<Move>> allMoves;
+    std::vector<std::shared_ptr<Move>> rook = getRookLegalMoves<side>();
+    std::vector<std::shared_ptr<Move>> queen = getQueenLegalMoves<side>();
+    std::vector<std::shared_ptr<Move>> knight = getKnightLegalMoves<side>();
+    std::vector<std::shared_ptr<Move>> bishop = getBishopLegalMoves<side>();
+    std::vector<std::shared_ptr<Move>> king = getKingLegalMoves<side>();
+    std::vector<std::shared_ptr<Move>> pawn = getPawnLegalMoves<side>();
+
+    const uint32_t movesSize = rook.size() + queen.size() + bishop.size() + king.size() + pawn.size() + knight.size();
+    if (movesSize == 0 and board.isKingChecked<side>()) {
+        board.registerCheckmate<side>();
+    }
+    if (movesSize == 0 and not board.isKingChecked<side>()) {
+        board.registerDraw(); // stalemate
+    }
+    if (board.checkDraw50MoveRule()) {
+        return {};
+    }
+
+    allMoves.reserve(movesSize);
     allMoves.insert(allMoves.end(), rook.begin(), rook.end());
     allMoves.insert(allMoves.end(), queen.begin(), queen.end());
     allMoves.insert(allMoves.end(), bishop.begin(), bishop.end());
@@ -27,8 +46,8 @@ template <Color side>
 }
 
 template <Color side>
-std::vector<Move> LegalMove::getKingLegalMoves() const noexcept {
-    std::vector<Move> moves;
+std::vector<std::shared_ptr<Move>> LegalMove::getKingLegalMoves() const noexcept {
+    std::vector<std::shared_ptr<Move>> moves;
 
     uint64_t kingBoard = board.king.getBitboard<side>();
     const auto kingSquare = Utils::popLSB(kingBoard);
@@ -36,42 +55,43 @@ std::vector<Move> LegalMove::getKingLegalMoves() const noexcept {
     MoveBuilder moveBuilder;
 
     const uint64_t basicMoves = ~board.computeDangerTable<side>() & King::getMoves(board.king.getBitboard<side>());
-    Utils::runForEachSetBit(basicMoves, [&moves, &moveBuilder, &kingSquare, this](const Square &square) noexcept -> void {
-        moves.push_back(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove());
+    Utils::runForEachSetBit(basicMoves, [&moves, &moveBuilder, &kingSquare](const Square &square) noexcept -> void {
+        moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove()));
     });
 
-    Utils::runForEachSetBit(board.getCastleRightsBitboard<side>(),
-                            [&moves, &moveBuilder, &kingSquare, this](const Square &square) noexcept -> void {
-                                if constexpr (side == WHITE) {
-                                    if (square == Utils::KING_SIDE_CASTLE_WHITE) {
-                                        moves.push_back(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle());
-                                        return;
-                                    }
-                                    if (square == Utils::QUEEN_SIDE_CASTLE_WHITE) {
-                                        moves.push_back(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle());
-                                        return;
-                                    }
-                                } else {
-                                    if (square == Utils::QUEEN_SIDE_CASTLE_BLACK) {
-                                        moves.push_back(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle());
-                                        return;
-                                    }
-                                    if (square == Utils::KING_SIDE_CASTLE_BLACK) {
-                                        moves.push_back(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle());
-                                        return;
-                                    }
-                                }
+    Utils::runForEachSetBit(
+        board.getCastleRightsBitboard<side>(),
+        [&moves, &moveBuilder, &kingSquare](const Square &square) noexcept -> void {
+            if constexpr (side == WHITE) {
+                if (square == Utils::KING_SIDE_CASTLE_WHITE) {
+                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle()));
+                    return;
+                }
+                if (square == Utils::QUEEN_SIDE_CASTLE_WHITE) {
+                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle()));
+                    return;
+                }
+            } else {
+                if (square == Utils::QUEEN_SIDE_CASTLE_BLACK) {
+                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle()));
+                    return;
+                }
+                if (square == Utils::KING_SIDE_CASTLE_BLACK) {
+                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle()));
+                    return;
+                }
+            }
 
-                                moves.push_back(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove());
-                            });
+            moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove()));
+        });
 
     return moves;
 }
 
 template <Color side>
-std::vector<Move> LegalMove::getRookLegalMoves() const noexcept {
+std::vector<std::shared_ptr<Move>> LegalMove::getRookLegalMoves() const noexcept {
+    std::vector<std::shared_ptr<Move>> moves;
 
-    std::vector<Move> moves;
     MoveBuilder moveBuilder;
     const uint64_t pinnedRooksCannotMove = board.rooks.getBitboard<side>() & board.getPinnedMaskD12<side>();
 
@@ -84,7 +104,7 @@ std::vector<Move> LegalMove::getRookLegalMoves() const noexcept {
                                     board.getPinnedMaskHV<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withRook().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRook().getMove()));
         });
     });
     Utils::runForEachSetBit(freeRooks, [this, &moveBuilder, &moves](const Square &originSquare) {
@@ -93,16 +113,16 @@ std::vector<Move> LegalMove::getRookLegalMoves() const noexcept {
                                     board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withRook().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRook().getMove()));
         });
     });
+
     return moves;
 }
 
 template <Color side>
-std::vector<Move> LegalMove::getPawnLegalMoves() noexcept {
-
-    std::vector<Move> moves;
+std::vector<std::shared_ptr<Move>> LegalMove::getPawnLegalMoves() noexcept {
+    std::vector<std::shared_ptr<Move>> moves;
     MoveBuilder moveBuilder;
 
     const uint64_t pawnsCannotAttack = board.pawns.getBitboard<side>() & board.getPinnedMaskHV<side>();
@@ -114,7 +134,7 @@ std::vector<Move> LegalMove::getPawnLegalMoves() noexcept {
             Pawn::getMoves<side>(originSquare, board.getEmptySquares()) & board.getCheckMask<side>() & board.getPinnedMaskHV<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
 
@@ -123,7 +143,7 @@ std::vector<Move> LegalMove::getPawnLegalMoves() noexcept {
                                                  (board.getOccupiedSquares<Utils::flipColor(side)>() | board.enPassant) &
                                                  board.getCheckMask<side>() & board.getPinnedMaskD12<side>();
         Utils::runForEachSetBit(legalMovesWithEnpassant, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().getMove()));
         });
     });
 
@@ -136,24 +156,27 @@ std::vector<Move> LegalMove::getPawnLegalMoves() noexcept {
         const uint64_t legalPushes = Pawn::getMoves<side>(originSquare, board.getEmptySquares()) & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMovesWithEnpassant, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().withEnPassantCapture());
+            moves.emplace_back(
+                std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().withEnPassantCapture()));
         });
 
         Utils::runForEachSetBit(legalPushes, [&originSquare, &moveBuilder, &moves](const Square &square) {
             if constexpr (side == WHITE) {
 
                 if (Utils::setSquare(square) & Utils::DOUBLE_PUSH_RANK_WHITE && Utils::setSquare(square) & Utils::PAWNS_STARTER_WHITE) {
-                    moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush());
+                    moves.emplace_back(
+                        std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush()));
                     return;
                 }
             } else {
                 if (Utils::setSquare(square) & Utils::DOUBLE_PUSH_RANK_BLACK && Utils::setSquare(square) & Utils::PAWNS_STARTER_BLACK) {
-                    moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush());
+                    moves.emplace_back(
+                        std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush()));
                     return;
                 }
             }
 
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()); // not covered
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
     return moves;
@@ -229,8 +252,8 @@ template <Color side>
 }
 
 template <Color side>
-std::vector<Move> LegalMove::getQueenLegalMoves() const noexcept {
-    std::vector<Move> moves;
+std::vector<std::shared_ptr<Move>> LegalMove::getQueenLegalMoves() const noexcept {
+    std::vector<std::shared_ptr<Move>> moves;
     MoveBuilder moveBuilder;
 
     const uint64_t pinnedQueensHV = board.queens.getBitboard<side>() & board.getPinnedMaskHV<side>();
@@ -243,7 +266,7 @@ std::vector<Move> LegalMove::getQueenLegalMoves() const noexcept {
                                     board.getPinnedMaskD12<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
         });
     });
 
@@ -253,7 +276,7 @@ std::vector<Move> LegalMove::getQueenLegalMoves() const noexcept {
                                     board.getPinnedMaskHV<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
         });
     });
 
@@ -263,7 +286,7 @@ std::vector<Move> LegalMove::getQueenLegalMoves() const noexcept {
                                     board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
         });
     });
 
@@ -271,8 +294,8 @@ std::vector<Move> LegalMove::getQueenLegalMoves() const noexcept {
 }
 
 template <Color side>
-std::vector<Move> LegalMove::getKnightLegalMoves() const noexcept {
-    std::vector<Move> moves;
+std::vector<std::shared_ptr<Move>> LegalMove::getKnightLegalMoves() const noexcept {
+    std::vector<std::shared_ptr<Move>> moves;
     const uint64_t freeKnights = board.knights.getBitboard<side>() ^
                                  (board.knights.getBitboard<side>() & (board.getPinnedMaskD12<side>() | board.getPinnedMaskHV<side>()));
     MoveBuilder moveBuilder = MoveBuilder{};
@@ -280,16 +303,17 @@ std::vector<Move> LegalMove::getKnightLegalMoves() const noexcept {
     Utils::runForEachSetBit(freeKnights, [&moveBuilder, this, &moves](const Square &originSquare) -> void {
         Utils::runForEachSetBit(Knight::getMoves(originSquare) & ~board.getOccupiedSquares<side>() & board.getCheckMask<side>(),
                                 [&moveBuilder, &originSquare, &moves](const Square &legalSquare) -> void {
-                                    moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(legalSquare).withKnight().getMove());
+                                    moves.emplace_back(std::make_shared<RookMove>(
+                                        moveBuilder.fromSquare(originSquare).toSquare(legalSquare).withKnight().getMove()));
                                 });
     });
     return moves;
 }
 
 template <Color side>
-std::vector<Move> LegalMove::getBishopLegalMoves() const noexcept {
+std::vector<std::shared_ptr<Move>> LegalMove::getBishopLegalMoves() const noexcept {
 
-    std::vector<Move> moves;
+    std::vector<std::shared_ptr<Move>> moves;
     MoveBuilder moveBuilder;
     const uint64_t pinnedBishopsCannotMove = board.bishops.getBitboard<side>() & board.getPinnedMaskHV<side>();
 
@@ -302,7 +326,7 @@ std::vector<Move> LegalMove::getBishopLegalMoves() const noexcept {
                                     board.getPinnedMaskD12<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
         });
     });
 
@@ -312,7 +336,7 @@ std::vector<Move> LegalMove::getBishopLegalMoves() const noexcept {
                                     board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove());
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
         });
     });
 

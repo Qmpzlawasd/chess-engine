@@ -4,37 +4,39 @@
 #include "Move.h"
 
 class KingMove : public Move {
+  public:
+    KingMove(const Move &move) : Move(move){};
+
     virtual void makeMove(Board &board) noexcept override {
         const auto fromSquare = static_cast<const Square>(this->getFrom());
         const auto toSquare = static_cast<const Square>(this->getTo());
 
         if (board.turn == WHITE) {
+            Move::makeCapture<WHITE>(board, toSquare);
+            board.castleWhite.kingMoved();
 
             board.king.flipSquare<WHITE>(fromSquare);
             board.king.flipSquare<WHITE>(toSquare);
-            board.castleWhite.kingMoved();
             if (isQueenSideCastle()) {
                 board.rooks.flipSquare<WHITE>(A1);
                 board.rooks.flipSquare<WHITE>(D1);
             } else if (isKingSideCastle()) {
                 board.rooks.flipSquare<WHITE>(H1);
                 board.rooks.flipSquare<WHITE>(F1);
-            } else {
-                Move::makeCapture<WHITE>(board, Utils::setSquare(toSquare) & board.getOccupiedSquares<BLACK>());
             }
 
         } else {
+            Move::makeCapture<BLACK>(board, toSquare);
+            board.castleBlack.kingMoved();
+
             board.king.flipSquare<BLACK>(fromSquare);
             board.king.flipSquare<BLACK>(toSquare);
-            board.castleBlack.kingMoved();
             if (isQueenSideCastle()) {
-                board.rooks.flipSquare<WHITE>(A8);
-                board.rooks.flipSquare<WHITE>(D8);
+                board.rooks.flipSquare<BLACK>(A8);
+                board.rooks.flipSquare<BLACK>(D8);
             } else if (isKingSideCastle()) {
-                board.rooks.flipSquare<WHITE>(H8);
-                board.rooks.flipSquare<WHITE>(F8);
-            } else {
-                Move::makeCapture<BLACK>(board, Utils::setSquare(toSquare) & board.getOccupiedSquares<BLACK>());
+                board.rooks.flipSquare<BLACK>(H8);
+                board.rooks.flipSquare<BLACK>(F8);
             }
         }
 

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 
+#include "Enums/BoardStatus.h"
 #include "Enums/Colors.h"
 #include "Enums/Squares.h"
 #include "FEN.h"
@@ -36,6 +37,7 @@ class Board {
     Pawn pawns;
 
     Color turn;
+    BoardStatus status;
 
     Castle<WHITE> castleWhite;
     Castle<BLACK> castleBlack;
@@ -68,7 +70,26 @@ class Board {
 
     void printStatus(std::ostream &os) const;
 
-    [[nodiscard]] bool checkMoveIsEnPassant(const uint64_t &bitboard) { return enPassant & bitboard; }
+    void registerDraw() noexcept { status = DRAW; }
+
+    void resetHalfMoveClock() noexcept { halfmoveClock = 0; }
+
+    bool checkDraw50MoveRule() noexcept {
+        if (halfmoveClock >= 100) {
+            status = DRAW;
+            return true;
+        }
+        return false;
+    };
+
+    template <Color side>
+    void registerCheckmate() noexcept {
+        if constexpr (side == WHITE) {
+            status = WIN_WHITE;
+        } else {
+            status = WIN_BLACK;
+        }
+    };
 
     template <Color side>
     [[nodiscard]] uint64_t getCastleRightsBitboard() const noexcept;
@@ -77,24 +98,6 @@ class Board {
     [[nodiscard]] bool isKingChecked() const noexcept {
         uint64_t kingBoard = king.getBitboard<side>();
         return isSquareAttacked<side>(Utils::popLSB(kingBoard));
-    }
-
-    template <Color side>
-    [[nodiscard]] bool checkMoveIsPromotion(const uint64_t &bitboard) {
-        if constexpr (side == WHITE) {
-            return bitboard & Utils::LAST_ROW;
-        } else {
-            return bitboard & Utils::FIRST_ROW;
-        }
-    }
-
-    template <Color side>
-    [[nodiscard]] bool checkMoveIsCapture(const uint64_t &bitboard) {
-        if constexpr (side == WHITE) {
-            return bitboard & getOccupiedSquares<BLACK>();
-        } else {
-            return bitboard & getOccupiedSquares<WHITE>();
-        }
     }
 
     template <Color side>
@@ -135,7 +138,7 @@ class Board {
         : king{FEN::parsePiece(fen, 'K'), FEN::parsePiece(fen, 'k')}, queens{FEN::parsePiece(fen, 'Q'), FEN::parsePiece(fen, 'q')},
           rooks{FEN::parsePiece(fen, 'R'), FEN::parsePiece(fen, 'r')}, bishops{FEN::parsePiece(fen, 'B'), FEN::parsePiece(fen, 'b')},
           knights{FEN::parsePiece(fen, 'N'), FEN::parsePiece(fen, 'n')}, pawns{FEN::parsePiece(fen, 'P'), FEN::parsePiece(fen, 'p')},
-          turn{FEN::parseTurn(fen)}, castleWhite{FEN::parseCastle<WHITE>(fen)}, castleBlack{FEN::parseCastle<BLACK>(fen)},
+          turn{FEN::parseTurn(fen)}, status{TBA}, castleWhite{FEN::parseCastle<WHITE>(fen)}, castleBlack{FEN::parseCastle<BLACK>(fen)},
           enPassant{FEN::parseEnPassant(fen)}, halfmoveClock{FEN::parseHalfmoveClock(fen)}, fullmoveNumber{FEN::parseFullmoveNumber(fen)},
           pinnedMaskHVWhite{computePinMaskHV<WHITE>()}, pinnedMaskHVBlack{computePinMaskHV<BLACK>()},
           pinnedMaskD12White{computePinMaskD12<WHITE>()}, pinnedMaskD12Black{computePinMaskD12<BLACK>()},

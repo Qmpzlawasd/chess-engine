@@ -21,19 +21,24 @@ class Move {
 
   protected:
     template <Color side>
-    void makeCapture(Board &board, const uint64_t &capture) noexcept {
-        if (board.queens.getBitboard<side>() & capture) {
-            board.queens.flipSquare<side>(Utils::popLSBCopy(capture));
-        } else if (board.rooks.getBitboard<side>() & capture) {
-            board.rooks.flipSquare<side>(Utils::popLSBCopy(capture));
-        } else if (board.pawns.getBitboard<side>() & capture) {
-            board.pawns.flipSquare<side>(Utils::popLSBCopy(capture));
-        } else if (board.knights.getBitboard<side>() & capture) {
-            board.knights.flipSquare<side>(Utils::popLSBCopy(capture));
-        } else if (board.king.getBitboard<side>() & capture) {
-            board.king.flipSquare<side>(Utils::popLSBCopy(capture));
-        } else if (board.bishops.getBitboard<side>() & capture) {
-            board.bishops.flipSquare<side>(Utils::popLSBCopy(capture));
+    void makeCapture(Board &board, const Square &square) noexcept {
+        constexpr Color enemy = Utils::flipColor(side);
+        const uint64_t capture = Utils::setSquare(square) & board.getOccupiedSquares<enemy>();
+        if (!capture)
+            return;
+
+        board.resetHalfMoveClock();
+
+        if (board.pawns.getBitboard<enemy>() & capture) {
+            board.pawns.flipSquare<enemy>(Utils::popLSBCopy(capture));
+        } else if (board.knights.getBitboard<enemy>() & capture) {
+            board.knights.flipSquare<enemy>(Utils::popLSBCopy(capture));
+        } else if (board.bishops.getBitboard<enemy>() & capture) {
+            board.bishops.flipSquare<enemy>(Utils::popLSBCopy(capture));
+        } else if (board.rooks.getBitboard<enemy>() & capture) {
+            board.rooks.flipSquare<enemy>(Utils::popLSBCopy(capture));
+        } else if (board.queens.getBitboard<enemy>() & capture) {
+            board.queens.flipSquare<enemy>(Utils::popLSBCopy(capture));
         } else {
             puts("*PANIC, MOVE DOES NOT EXIST*");
             std::cout << move;
@@ -42,8 +47,8 @@ class Move {
     }
 
   public:
-    explicit Move(uint16_t _move = 0) : move{_move} {};
-    virtual void makeMove(Board &board) noexcept { // call la final
+    explicit Move(const uint16_t _move = 0) : move{_move} {};
+    virtual void makeMove(Board &board) noexcept {
         board.halfmoveClock++;
 
         if (board.turn == BLACK) {
@@ -111,8 +116,7 @@ class Move {
 
     friend std::ostream &operator<<(std::ostream &os, const Move &_move) {
 
-        os << Utils::squareToString(static_cast<Square>(_move.getFrom())) << "->"
-           << Utils::squareToString(static_cast<Square>(_move.getTo())) << " " << static_cast<int>(_move.getFlags()) << '\n';
+        os << Utils::squareToString(static_cast<Square>(_move.getFrom())) << Utils::squareToString(static_cast<Square>(_move.getTo()));
         return os;
     }
     virtual ~Move() = default;

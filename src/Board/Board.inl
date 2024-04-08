@@ -53,17 +53,17 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
     uint64_t emptySquares = getEmptySquares();
     if constexpr (side == WHITE) {
         if (castleWhite.hasRookMoved<QUEEN_SIDE>()) {
-            if (emptySquares & Utils::setSquare(B1) && emptySquares & Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_WHITE) &&
+            if (emptySquares & Utils::setSquare(B1) and emptySquares & Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_WHITE) and
                 emptySquares & Utils::setSquare(D1)) {
-                if (!isSquareAttacked<side>(Utils::QUEEN_SIDE_CASTLE_WHITE) && !isSquareAttacked<side>(D1)) {
+                if (!isSquareAttacked<side>(Utils::QUEEN_SIDE_CASTLE_WHITE) and !isSquareAttacked<side>(D1)) {
                     castleBoard |= Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_WHITE);
                 }
             }
         }
 
         if (castleWhite.hasRookMoved<KING_SIDE>()) {
-            if (emptySquares & Utils::setSquare(F1) && emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_WHITE)) {
-                if (!isSquareAttacked<side>(F1) && !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_WHITE)) {
+            if (emptySquares & Utils::setSquare(F1) and emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_WHITE)) {
+                if (!isSquareAttacked<side>(F1) and !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_WHITE)) {
                     castleBoard |= Utils::setSquare(Utils::KING_SIDE_CASTLE_WHITE);
                 }
             }
@@ -71,18 +71,16 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
 
     } else {
         if (castleBlack.hasRookMoved<QUEEN_SIDE>()) {
-            if (!castleWhite.hasRookMoved<QUEEN_SIDE>()) {
-                if (emptySquares & Utils::setSquare(B8) && emptySquares & Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_BLACK) &&
-                    emptySquares & Utils::setSquare(D8)) {
-                    if (!isSquareAttacked<side>(Utils::QUEEN_SIDE_CASTLE_BLACK) && !isSquareAttacked<side>(D8)) {
-                        castleBoard |= Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_BLACK);
-                    }
+            if (emptySquares & Utils::setSquare(B8) and emptySquares & Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_BLACK) and
+                emptySquares & Utils::setSquare(D8)) {
+                if (!isSquareAttacked<side>(Utils::QUEEN_SIDE_CASTLE_BLACK) and !isSquareAttacked<side>(D8)) {
+                    castleBoard |= Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_BLACK);
                 }
             }
 
             if (castleBlack.hasRookMoved<KING_SIDE>()) {
-                if (emptySquares & Utils::setSquare(F8) && emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK)) {
-                    if (!isSquareAttacked<side>(F8) && !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_BLACK)) {
+                if (emptySquares & Utils::setSquare(F8) and emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK)) {
+                    if (!isSquareAttacked<side>(F8) and !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_BLACK)) {
                         castleBoard |= Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK);
                     }
                 }
@@ -94,7 +92,7 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
 
 template <Color side>
 uint64_t Board::isSquareAttacked(const Square &square) const {
-    return rookAttacksSquare<side>(square) | bishopAttacksSquare<BLACK>(square) | pawnAttacksSquare<side>(square) |
+    return rookAttacksSquare<side>(square) | bishopAttacksSquare<side>(square) | pawnAttacksSquare<side>(square) |
            kingAttacksSquare<side>(square) | queenAttacksSquare<side>(square) | knightAttacksSquare<side>(square);
 }
 
