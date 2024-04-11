@@ -7,25 +7,30 @@
 class MoveBuilder {
     Move move;
 
-
   public:
-    explicit MoveBuilder() : move(0) {};
+    explicit MoveBuilder() : move(0){};
 
     MoveBuilder &toSquare(const Square &);
 
     MoveBuilder &fromSquare(const Square &);
 
-    MoveBuilder &withPromotion();
-
     MoveBuilder &withCapture();
 
-    MoveBuilder &withKnight();
+    Move withKnightPromotion();
 
-    MoveBuilder &withBishop();
+    Move withKnightPromotionCapture();
 
-    MoveBuilder &withRook();
+    Move withBishopPromotion();
 
-    MoveBuilder &withQueen();
+    Move withBishopPromotionCapture();
+
+    Move withRookPromotion();
+
+    Move withRookPromotionCapture();
+
+    Move withQueenPromotion();
+
+    Move withQueenPromotionCapture();
 
     Move withDoublePawnPush();
 
@@ -34,8 +39,6 @@ class MoveBuilder {
     Move withQueenSideCastle();
 
     Move withEnPassantCapture();
-
-    Move withEnPassant();
 
     Move getMove();
 };

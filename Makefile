@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -I $(SRC_DIR) -Wall -std=c++23 -pthread -Weffc++ -march=native
+CFLAGS = -I $(SRC_DIR) -Wall -std=c++23 -pthread -Weffc++ -march=native -g
 CWARNING = -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused
 
 
@@ -28,4 +28,5 @@ engine-debug: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 	$(CC) -o $(BUILD_DIR)/$(TARGET) $(ENGINE_SRCS) $(CFLAGS) $(CWARNING)
 
 run:
-	./$(BUILD_DIR)/$(TARGET)
+	./$(BUILD_DIR)/$(TARGET) "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 10 10" 2
+

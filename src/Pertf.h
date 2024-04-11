@@ -22,7 +22,7 @@ class Pertf {
         uint32_t nodes = 0;
         std::for_each(moves->begin(), moves->end(), [&depth, board, &nodes](const std::shared_ptr<Move> &move) -> void {
             Board newBoard{board};
-            std::cout << '\t' << *move << '\n';
+            //            std::cout << '\t' << *move << '\n';
 
             move->makeMove(newBoard);
             nodes += countNodes<Utils::flipColor(side)>(newBoard, depth - 1);
@@ -30,14 +30,10 @@ class Pertf {
 
         return nodes;
     }
-    // e2a6:
-    //    d5e6: 41 mie
-    //    d5e6: 46 el
 
     template <Color side>
     static void startTest(const char *fen, const char *depth) noexcept {
-        fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 10 10";
-        depth = "2";
+
         Board board{fen};
         LegalMove legalMove{board};
         std::optional<std::vector<std::shared_ptr<Move>>> moves;
@@ -47,7 +43,7 @@ class Pertf {
             moves = legalMove.getLegalMoves<BLACK>();
         }
         if (moves->empty()) {
-            puts("Asd");
+            puts("PANIC");
             return;
         }
         uint64_t totalNodes = 0;

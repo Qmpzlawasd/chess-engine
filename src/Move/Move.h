@@ -37,10 +37,24 @@ class Move {
             board.bishops.flipSquare<enemy>(Utils::popLSBCopy(capture));
         } else if (board.rooks.getBitboard<enemy>() & capture) {
             board.rooks.flipSquare<enemy>(Utils::popLSBCopy(capture));
+            if constexpr (enemy == WHITE) {
+                if (Utils::popLSBCopy(capture) == H1)
+                    board.castleWhite.rookMoved<KING_SIDE>();
+                else if (Utils::popLSBCopy(capture) == A1)
+                    board.castleWhite.rookMoved<QUEEN_SIDE>();
+            } else {
+                if (Utils::popLSBCopy(capture) == H8)
+                    board.castleBlack.rookMoved<KING_SIDE>();
+                else if (Utils::popLSBCopy(capture) == A8)
+                    board.castleBlack.rookMoved<QUEEN_SIDE>();
+            }
+
         } else if (board.queens.getBitboard<enemy>() & capture) {
             board.queens.flipSquare<enemy>(Utils::popLSBCopy(capture));
+        } else if (board.king.getBitboard<enemy>() & capture) {
+            ;
         } else {
-            puts("*PANIC, MOVE DOES NOT EXIST*");
+            puts("*PANIC, CAPTURE DOES NOT EXIST*");
             std::cout << move;
             puts("****************************");
         }
@@ -76,8 +90,6 @@ class Move {
 
     void resetMove() { move = 0; }
 
-    void setPromotion() { Move::move = Move::move | 0x8; }
-
     void setCapture() { Move::move = Move::move | 0x4; }
 
     void setDoublePawnPush() { Move::move = Move::move | 0x1; }
@@ -88,15 +100,21 @@ class Move {
 
     void setEnPassantCapture() { Move::move = Move::move | 0x5; }
 
-    void setEnPassant() { Move::move = Move::move | 0x5; }
+    void setKnightPromotion() { Move::move |= 8; }
 
-    void setWithKnight() const { (void)0; }
+    void setBishopPromotion() { Move::move |= 9; }
 
-    void setWithBishop() { Move::move = Move::move | 0x1; }
+    void setRookPromotion() { Move::move |= 10; }
 
-    void setWithRook() { Move::move = Move::move | 0x2; }
+    void setQueenPromotion() { Move::move |= 11; }
 
-    void setWithQueen() { Move::move = Move::move | 0x3; }
+    void setKnightPromotionCapture() { Move::move |= 12; }
+
+    void setBishopPromotionCapture() { Move::move |= 13; }
+
+    void setRookPromotionCapture() { Move::move |= 14; }
+
+    void setQueenPromotionCapture() { Move::move |= 15; }
 
     [[nodiscard]] uint8_t getTo() const { return move >> 0xA; }
 
@@ -104,19 +122,48 @@ class Move {
 
     [[nodiscard]] uint8_t getFlags() const { return move & 0x000F; }
 
-    [[nodiscard]] bool isCapture() const { return move & 0x4; }
+    [[nodiscard]] bool isPromotion() const { return (move & 8) == 8; }
 
-    [[nodiscard]] bool isPromotion() const { return move & 0x8; }
+    [[nodiscard]] bool isCapture() const { return (move & 0x4) == 0x4; }
 
-    [[nodiscard]] bool isDoublePush() const { return move & 0x1; }
+    [[nodiscard]] bool isDoublePush() const { return (move & 0x1) == 0x1; }
 
-    [[nodiscard]] bool isKingSideCastle() const { return move & 0x2; }
+    [[nodiscard]] bool isKingSideCastle() const { return (move & 0x2) == 0x2; }
 
-    [[nodiscard]] bool isQueenSideCastle() const { return move & 0x3; }
+    [[nodiscard]] bool isQueenSideCastle() const { return (move & 0x3) == 0x3; }
+
+    [[nodiscard]] bool isKnightPromotion() const { return (Move::move & 8) == 8; }
+
+    [[nodiscard]] bool isBishopPromotion() const { return (Move::move & 9) == 9; }
+
+    [[nodiscard]] bool isRookPromotion() const { return (Move::move & 10) == 10; }
+
+    [[nodiscard]] bool isKnightPromotionCapture() const { return (Move::move & 12) == 12; }
+
+    [[nodiscard]] bool isBishopPromotionCapture() const { return (Move::move & 13) == 13; }
+
+    [[nodiscard]] bool isRookPromotionCapture() const { return (Move::move & 14) == 14; }
+
+    [[nodiscard]] bool isQueenPromotionCapture() const { return (Move::move & 15) == 15; }
+
+    [[nodiscard]] bool isQueenPromotion() const { return (Move::move & 11) == 11; }
+
+    [[nodiscard]] bool isEnPassant() const { return (Move::move & 0x5) == 5; }
 
     friend std::ostream &operator<<(std::ostream &os, const Move &_move) {
 
         os << Utils::squareToString(static_cast<Square>(_move.getFrom())) << Utils::squareToString(static_cast<Square>(_move.getTo()));
+        if (_move.isPromotion()) {
+            if (_move.isQueenPromotion() or _move.isQueenPromotionCapture()) {
+                os << 'q';
+            } else if (_move.isRookPromotionCapture() or _move.isRookPromotion()) {
+                os << 'r';
+            } else if (_move.isBishopPromotionCapture() or _move.isBishopPromotion()) {
+                os << 'b';
+            } else if (_move.isKnightPromotion() or _move.isKnightPromotionCapture()) {
+                os << 'n';
+            }
+        }
         return os;
     }
     virtual ~Move() = default;

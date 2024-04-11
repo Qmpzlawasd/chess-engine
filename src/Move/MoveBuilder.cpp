@@ -11,11 +11,6 @@ MoveBuilder &MoveBuilder::fromSquare(const Square &fromSquare) {
     return *this;
 }
 
-MoveBuilder &MoveBuilder::withPromotion() {
-    move.setPromotion();
-    return *this;
-}
-
 MoveBuilder &MoveBuilder::withCapture() {
     move.setCapture();
     return *this;
@@ -49,31 +44,56 @@ Move MoveBuilder::withEnPassantCapture() {
     return moveCopy;
 }
 
-Move MoveBuilder::withEnPassant() {
-    move.setEnPassant();
+Move MoveBuilder::withKnightPromotionCapture() {
+    move.setKnightPromotionCapture();
     Move moveCopy = move.getMoveCopy();
     move.resetMove();
     return moveCopy;
 }
 
-MoveBuilder &MoveBuilder::withKnight() {
-    move.setWithKnight();
-    return *this;
+Move MoveBuilder::withBishopPromotionCapture() {
+    move.setBishopPromotionCapture();
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 
-MoveBuilder &MoveBuilder::withBishop() {
-    move.setWithBishop();
-    return *this;
+Move MoveBuilder::withRookPromotionCapture() {
+    move.setRookPromotionCapture();
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 
-MoveBuilder &MoveBuilder::withRook() {
-    move.setWithRook();
-    return *this;
+Move MoveBuilder::withQueenPromotionCapture() {
+    move.setQueenPromotionCapture();
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
-
-MoveBuilder &MoveBuilder::withQueen() {
-    move.setWithQueen();
-    return *this;
+Move MoveBuilder::withKnightPromotion() {
+    move.setKnightPromotion();
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
+}
+Move MoveBuilder::withBishopPromotion() {
+    move.setBishopPromotion();
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
+}
+Move MoveBuilder::withRookPromotion() {
+    move.setRookPromotion();
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
+}
+Move MoveBuilder::withQueenPromotion() {
+    move.setQueenPromotion();
+    Move moveCopy = move.getMoveCopy();
+    move.resetMove();
+    return moveCopy;
 }
 
 Move MoveBuilder::getMove() {
@@ -81,4 +101,3 @@ Move MoveBuilder::getMove() {
     move.resetMove();
     return moveCopy;
 }
-

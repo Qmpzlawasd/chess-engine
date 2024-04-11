@@ -36,7 +36,8 @@ uint64_t Board::computePinMaskHV() const {
                             [&pinnedHV, &kingAsRookRay, &kingSquare, this](const Square &square) {
                                 const uint64_t rookAsRookRay = Rook::getMoves(square, getEmptySquares());
 
-                                if (kingAsRookRay & rookAsRookRay & getOccupiedSquares<side>()) {
+                                if (kingAsRookRay & rookAsRookRay & getOccupiedSquares<side>() &
+                                    Utils::getSetLineBetween(kingSquare, square)) {
                                     pinnedHV |= Utils::getSetLineBetween(kingSquare, square);
                                 }
                             });
@@ -77,12 +78,12 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
                     castleBoard |= Utils::setSquare(Utils::QUEEN_SIDE_CASTLE_BLACK);
                 }
             }
+        }
 
-            if (castleBlack.hasRookMoved<KING_SIDE>()) {
-                if (emptySquares & Utils::setSquare(F8) and emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK)) {
-                    if (!isSquareAttacked<side>(F8) and !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_BLACK)) {
-                        castleBoard |= Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK);
-                    }
+        if (castleBlack.hasRookMoved<KING_SIDE>()) {
+            if (emptySquares & Utils::setSquare(F8) and emptySquares & Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK)) {
+                if (!isSquareAttacked<side>(F8) and !isSquareAttacked<side>(Utils::KING_SIDE_CASTLE_BLACK)) {
+                    castleBoard |= Utils::setSquare(Utils::KING_SIDE_CASTLE_BLACK);
                 }
             }
         }
@@ -192,7 +193,8 @@ uint64_t Board::computePinMaskD12() const {
                             [&pinnedHV, &kingAsBishopRay, &kingSquare, this](const Square &square) {
                                 const uint64_t bishopRay = Bishop::getMoves(square, getEmptySquares());
 
-                                if (kingAsBishopRay & bishopRay & getOccupiedSquares<side>()) {
+                                if (kingAsBishopRay & bishopRay & getOccupiedSquares<side>() &
+                                    Utils::getSetLineBetween(kingSquare, square)) {
                                     pinnedHV |= Utils::getSetLineBetween(kingSquare, square);
                                 }
                             });

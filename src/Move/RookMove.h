@@ -6,6 +6,7 @@
 class RookMove : public Move {
   public:
     RookMove(const Move &move) : Move(move){};
+
     virtual void makeMove(Board &board) noexcept override {
         const auto fromSquare = static_cast<const Square>(this->getFrom());
         const auto toSquare = static_cast<const Square>(this->getTo());
@@ -13,9 +14,9 @@ class RookMove : public Move {
         if (board.turn == WHITE) {
             Move::makeCapture<WHITE>(board, toSquare);
 
-            if (fromSquare == Utils::KING_SIDE_CASTLE_WHITE) {
+            if (fromSquare == H1) {
                 board.castleWhite.rookMoved<KING_SIDE>();
-            } else if (fromSquare == Utils::QUEEN_SIDE_CASTLE_WHITE) {
+            } else if (fromSquare == A1) {
                 board.castleWhite.rookMoved<QUEEN_SIDE>();
             }
 
@@ -25,9 +26,9 @@ class RookMove : public Move {
         } else {
             Move::makeCapture<BLACK>(board, toSquare);
 
-            if (fromSquare == Utils::KING_SIDE_CASTLE_BLACK) {
+            if (fromSquare == H8) {
                 board.castleBlack.rookMoved<KING_SIDE>();
-            } else if (fromSquare == Utils::QUEEN_SIDE_CASTLE_BLACK) {
+            } else if (fromSquare == A8) {
                 board.castleBlack.rookMoved<QUEEN_SIDE>();
             }
 

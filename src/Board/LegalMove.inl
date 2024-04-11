@@ -5,6 +5,7 @@
 #include "LegalMove.h"
 #include "Move/BishopMove.h"
 #include "Move/KingMove.h"
+#include "Move/KnightMove.h"
 #include "Move/Move.h"
 #include "Move/PawnMove.h"
 #include "Move/QueenMove.h"
@@ -15,7 +16,6 @@ template <Color side>
     if (board.status != TBA)
         return {};
 
-    std::vector<std::shared_ptr<Move>> allMoves;
     std::vector<std::shared_ptr<Move>> rook = getRookLegalMoves<side>();
     std::vector<std::shared_ptr<Move>> queen = getQueenLegalMoves<side>();
     std::vector<std::shared_ptr<Move>> knight = getKnightLegalMoves<side>();
@@ -26,14 +26,16 @@ template <Color side>
     const uint32_t movesSize = rook.size() + queen.size() + bishop.size() + king.size() + pawn.size() + knight.size();
     if (movesSize == 0 and board.isKingChecked<side>()) {
         board.registerCheckmate<side>();
+        return {};
     }
     if (movesSize == 0 and not board.isKingChecked<side>()) {
         board.registerDraw(); // stalemate
+        return {};
     }
     if (board.checkDraw50MoveRule()) {
         return {};
     }
-
+    std::vector<std::shared_ptr<Move>> allMoves;
     allMoves.reserve(movesSize);
     allMoves.insert(allMoves.end(), rook.begin(), rook.end());
     allMoves.insert(allMoves.end(), queen.begin(), queen.end());
@@ -56,7 +58,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getKingLegalMoves() const noexcept
 
     const uint64_t basicMoves = ~board.computeDangerTable<side>() & King::getMoves(board.king.getBitboard<side>());
     Utils::runForEachSetBit(basicMoves, [&moves, &moveBuilder, &kingSquare](const Square &square) noexcept -> void {
-        moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove()));
+        moves.push_back(std::make_shared<KingMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove()));
     });
 
     Utils::runForEachSetBit(
@@ -64,25 +66,25 @@ std::vector<std::shared_ptr<Move>> LegalMove::getKingLegalMoves() const noexcept
         [&moves, &moveBuilder, &kingSquare](const Square &square) noexcept -> void {
             if constexpr (side == WHITE) {
                 if (square == Utils::KING_SIDE_CASTLE_WHITE) {
-                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle()));
+                    moves.push_back(std::make_shared<KingMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle()));
                     return;
                 }
                 if (square == Utils::QUEEN_SIDE_CASTLE_WHITE) {
-                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle()));
+                    moves.push_back(std::make_shared<KingMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle()));
                     return;
                 }
             } else {
                 if (square == Utils::QUEEN_SIDE_CASTLE_BLACK) {
-                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle()));
+                    moves.push_back(std::make_shared<KingMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withQueenSideCastle()));
                     return;
                 }
                 if (square == Utils::KING_SIDE_CASTLE_BLACK) {
-                    moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle()));
+                    moves.push_back(std::make_shared<KingMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).withKingSideCastle()));
                     return;
                 }
             }
 
-            moves.push_back(std::make_shared<RookMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove()));
+            moves.push_back(std::make_shared<KingMove>(moveBuilder.fromSquare(kingSquare).toSquare(square).getMove()));
         });
 
     return moves;
@@ -104,7 +106,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getRookLegalMoves() const noexcept
                                     board.getPinnedMaskHV<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRook().getMove()));
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
     Utils::runForEachSetBit(freeRooks, [this, &moveBuilder, &moves](const Square &originSquare) {
@@ -113,7 +115,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getRookLegalMoves() const noexcept
                                     board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRook().getMove()));
+            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
 
@@ -130,11 +132,25 @@ std::vector<std::shared_ptr<Move>> LegalMove::getPawnLegalMoves() noexcept {
     const uint64_t freePawns = board.pawns.getBitboard<side>() ^ (pawnsCannotBePushed | pawnsCannotAttack);
 
     Utils::runForEachSetBit(pawnsCannotAttack, [this, &moveBuilder, &moves](const Square &originSquare) {
-        const uint64_t legalMoves =
+        const uint64_t pushes =
             Pawn::getMoves<side>(originSquare, board.getEmptySquares()) & board.getCheckMask<side>() & board.getPinnedMaskHV<side>();
 
-        Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
+        Utils::runForEachSetBit(pushes, [&originSquare, &moveBuilder, &moves](const Square &square) {
+            bool isPromotion;
+            if constexpr (side == WHITE) {
+                isPromotion = Utils::setSquare(square) & Utils::LAST_ROW;
+            } else {
+                isPromotion = Utils::setSquare(square) & Utils::FIRST_ROW;
+            }
+
+            if (isPromotion) {
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishopPromotion()));
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRookPromotion()));
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withQueenPromotion()));
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withKnightPromotion()));
+            } else {
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
+            }
         });
     });
 
@@ -142,41 +158,102 @@ std::vector<std::shared_ptr<Move>> LegalMove::getPawnLegalMoves() noexcept {
         const uint64_t legalMovesWithEnpassant = Pawn::getThreatens<side>(originSquare) &
                                                  (board.getOccupiedSquares<Utils::flipColor(side)>() | board.enPassant) &
                                                  board.getCheckMask<side>() & board.getPinnedMaskD12<side>();
-        Utils::runForEachSetBit(legalMovesWithEnpassant, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().getMove()));
+        Utils::runForEachSetBit(legalMovesWithEnpassant, [&originSquare, &moveBuilder, &moves, this](const Square &square) {
+            if (board.enPassant != 0 and square == Utils::popLSBCopy(board.enPassant)) {
+                bool isPromotion;
+                if constexpr (side == WHITE) {
+                    isPromotion = Utils::setSquare(square) & Utils::LAST_ROW;
+                } else {
+                    isPromotion = Utils::setSquare(square) & Utils::FIRST_ROW;
+                }
+
+                if (isPromotion) {
+                    moves.emplace_back(
+                        std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishopPromotionCapture()));
+                    moves.emplace_back(
+                        std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRookPromotionCapture()));
+                    moves.emplace_back(
+                        std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withQueenPromotionCapture()));
+                    moves.emplace_back(
+                        std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withKnightPromotionCapture()));
+                } else {
+                    moves.emplace_back(
+                        std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withEnPassantCapture()));
+                }
+            } else {
+                moves.emplace_back(
+                    std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().getMove()));
+            }
         });
     });
 
     Utils::runForEachSetBit(freePawns, [this, &moveBuilder, &moves](const Square &originSquare) {
         const uint64_t canDoEnPassant = handlePawnShenanigans<side>(originSquare) ? 0 : board.enPassant;
+        const uint64_t legalPassant = Pawn::getThreatens<side>(originSquare) & canDoEnPassant;
 
-        const uint64_t legalMovesWithEnpassant = Pawn::getThreatens<side>(originSquare) &
-                                                 (board.getOccupiedSquares<Utils::flipColor(side)>() | canDoEnPassant) &
-                                                 board.getCheckMask<side>();
-        const uint64_t legalPushes = Pawn::getMoves<side>(originSquare, board.getEmptySquares()) & board.getCheckMask<side>();
-
-        Utils::runForEachSetBit(legalMovesWithEnpassant, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(
-                std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().withEnPassantCapture()));
+        Utils::runForEachSetBit(legalPassant, [&originSquare, &moveBuilder, &moves](const Square &square) {
+            moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withEnPassantCapture()));
         });
 
+        const uint64_t legalAttacks =
+            Pawn::getThreatens<side>(originSquare) & (board.getOccupiedSquares<Utils::flipColor(side)>()) & board.getCheckMask<side>();
+        Utils::runForEachSetBit(legalAttacks, [&originSquare, &moveBuilder, &moves](const Square &square) {
+            bool isPromotion;
+            if constexpr (side == WHITE) {
+                isPromotion = Utils::setSquare(square) & Utils::LAST_ROW;
+            } else {
+                isPromotion = Utils::setSquare(square) & Utils::FIRST_ROW;
+            }
+
+            if (isPromotion) {
+                moves.emplace_back(
+                    std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishopPromotionCapture()));
+                moves.emplace_back(
+                    std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRookPromotionCapture()));
+                moves.emplace_back(
+                    std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withQueenPromotionCapture()));
+                moves.emplace_back(
+                    std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withKnightPromotionCapture()));
+                return;
+            }
+            moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withCapture().getMove()));
+        });
+
+        const uint64_t legalPushes = Pawn::getMoves<side>(originSquare, board.getEmptySquares()) & board.getCheckMask<side>();
         Utils::runForEachSetBit(legalPushes, [&originSquare, &moveBuilder, &moves](const Square &square) {
+            bool isPromotion;
+            if constexpr (side == WHITE) {
+                isPromotion = Utils::setSquare(square) & Utils::LAST_ROW;
+            } else {
+                isPromotion = Utils::setSquare(square) & Utils::FIRST_ROW;
+            }
+
+            if (isPromotion) {
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishopPromotion()));
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withRookPromotion()));
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withQueenPromotion()));
+                moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withKnightPromotion()));
+                return;
+            }
+
             if constexpr (side == WHITE) {
 
-                if (Utils::setSquare(square) & Utils::DOUBLE_PUSH_RANK_WHITE && Utils::setSquare(square) & Utils::PAWNS_STARTER_WHITE) {
+                if (Utils::setSquare(square) & Utils::DOUBLE_PUSH_RANK_WHITE &&
+                    Utils::setSquare(originSquare) & Utils::PAWNS_STARTER_WHITE) {
                     moves.emplace_back(
-                        std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush()));
+                        std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush()));
                     return;
                 }
             } else {
-                if (Utils::setSquare(square) & Utils::DOUBLE_PUSH_RANK_BLACK && Utils::setSquare(square) & Utils::PAWNS_STARTER_BLACK) {
+                if (Utils::setSquare(square) & Utils::DOUBLE_PUSH_RANK_BLACK &&
+                    Utils::setSquare(originSquare) & Utils::PAWNS_STARTER_BLACK) {
                     moves.emplace_back(
-                        std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush()));
+                        std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withDoublePawnPush()));
                     return;
                 }
             }
 
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
+            moves.emplace_back(std::make_shared<PawnMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
     return moves;
@@ -184,15 +261,6 @@ std::vector<std::shared_ptr<Move>> LegalMove::getPawnLegalMoves() noexcept {
 
 template <Color side>
 [[nodiscard]] bool LegalMove::handlePawnShenanigans(const Square &square) noexcept {
-    if constexpr (side == WHITE) {
-        if ((Utils::setSquare(square) & Utils::CHECK_ENPASSANT_WHITE) == 0) {
-            return true;
-        }
-    } else {
-        if ((Utils::setSquare(square) & Utils::CHECK_ENPASSANT_BLACK) == 0) {
-            return true;
-        }
-    }
     uint64_t controversialPawn = 0;
     const Square kingSquare = Utils::popLSBCopy(board.king.getBitboard<side>());
     if constexpr (side == WHITE) {
@@ -266,7 +334,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getQueenLegalMoves() const noexcep
                                     board.getPinnedMaskD12<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
+            moves.emplace_back(std::make_shared<QueenMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
 
@@ -276,7 +344,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getQueenLegalMoves() const noexcep
                                     board.getPinnedMaskHV<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
+            moves.emplace_back(std::make_shared<QueenMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
 
@@ -286,7 +354,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getQueenLegalMoves() const noexcep
                                     board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
+            moves.emplace_back(std::make_shared<QueenMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
 
@@ -303,8 +371,8 @@ std::vector<std::shared_ptr<Move>> LegalMove::getKnightLegalMoves() const noexce
     Utils::runForEachSetBit(freeKnights, [&moveBuilder, this, &moves](const Square &originSquare) -> void {
         Utils::runForEachSetBit(Knight::getMoves(originSquare) & ~board.getOccupiedSquares<side>() & board.getCheckMask<side>(),
                                 [&moveBuilder, &originSquare, &moves](const Square &legalSquare) -> void {
-                                    moves.emplace_back(std::make_shared<RookMove>(
-                                        moveBuilder.fromSquare(originSquare).toSquare(legalSquare).withKnight().getMove()));
+                                    moves.emplace_back(
+                                        std::make_shared<KnightMove>(moveBuilder.fromSquare(originSquare).toSquare(legalSquare).getMove()));
                                 });
     });
     return moves;
@@ -326,7 +394,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getBishopLegalMoves() const noexce
                                     board.getPinnedMaskD12<side>() & board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
+            moves.emplace_back(std::make_shared<BishopMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
 
@@ -336,7 +404,7 @@ std::vector<std::shared_ptr<Move>> LegalMove::getBishopLegalMoves() const noexce
                                     board.getCheckMask<side>();
 
         Utils::runForEachSetBit(legalMoves, [&originSquare, &moveBuilder, &moves](const Square &square) {
-            moves.emplace_back(std::make_shared<RookMove>(moveBuilder.fromSquare(originSquare).toSquare(square).withBishop().getMove()));
+            moves.emplace_back(std::make_shared<BishopMove>(moveBuilder.fromSquare(originSquare).toSquare(square).getMove()));
         });
     });
 
