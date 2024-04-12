@@ -1,11 +1,11 @@
 #include "Board/LegalMove.h"
 #include "Pertf.h"
 
-int main(int argc, char *argv[]) {
+int main() {
     // idea when bishop is moved, restet only the danger tables for that sqare
-    // promotion pawn
+    // draw no material
 
-    Pertf::startTest<BLACK>("8/8/8/8/8/8/kp5Q/N6K b - - 0 1", "1");
+    Pertf::runTests();
 
     //    const std::string fenString = "rnbqkbnr/ppppppp1/8/7p/8/3P4/PPP1PPPP/RNBQKBNR w KQkq - 0 1";
     //    Board board{fenString};

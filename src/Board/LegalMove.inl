@@ -188,7 +188,20 @@ std::vector<std::shared_ptr<Move>> LegalMove::getPawnLegalMoves() noexcept {
     });
 
     Utils::runForEachSetBit(freePawns, [this, &moveBuilder, &moves](const Square &originSquare) {
-        const uint64_t canDoEnPassant = handlePawnShenanigans<side>(originSquare) ? 0 : board.enPassant;
+        uint64_t canDoEnPassant = handlePawnShenanigans<side>(originSquare) ? 0 : board.enPassant;
+        // pawn enpassant gives check
+
+        if constexpr (side == WHITE) {
+            canDoEnPassant >>= Utils::ROW_NUMBER;
+        } else {
+            canDoEnPassant <<= Utils::ROW_NUMBER;
+        }
+        if constexpr (side == WHITE) {
+            canDoEnPassant = (canDoEnPassant & board.getCheckMask<side>()) << Utils::ROW_NUMBER;
+        } else {
+            canDoEnPassant = (canDoEnPassant & board.getCheckMask<side>()) >> Utils::ROW_NUMBER;
+        }
+
         const uint64_t legalPassant = Pawn::getThreatens<side>(originSquare) & canDoEnPassant;
 
         Utils::runForEachSetBit(legalPassant, [&originSquare, &moveBuilder, &moves](const Square &square) {
