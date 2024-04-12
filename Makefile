@@ -12,7 +12,7 @@ TARGET = main
 ENGINE_DEPS = $(wildcard $(SRC_DIR)/*.h)
 ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp) $(wildcard $(SRC_DIR)/Board/*.cpp)
 
-.PHONY: pre-build all engine engine-debug run
+.PHONY: pre-build all engine engine-debug run check
 
 warning: pre-build engine-debug run
 
@@ -26,6 +26,9 @@ engine: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 
 engine-debug: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 	$(CC) -o $(BUILD_DIR)/$(TARGET) $(ENGINE_SRCS) $(CFLAGS) $(CWARNING)
+
+check: engine
+	./$(BUILD_DIR)/$(TARGET) "check"
 
 run:
 	./$(BUILD_DIR)/$(TARGET)

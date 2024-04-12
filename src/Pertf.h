@@ -64,7 +64,6 @@ class Pertf {
 
   public:
     static void runTests() {
-
         // en passant out of check
         assert(Pertf::startTest("8/8/8/8/8/8/kp5Q/N6K b - - 0 1", 1) == 3);
 
