@@ -5,9 +5,9 @@
 
 class BishopMove : public Move {
   public:
-    BishopMove(const Move &move) : Move(move){};
+    explicit BishopMove(const Move &_move) noexcept : Move(_move){};
 
-    virtual void makeMove(Board &board) noexcept override {
+    void makeMove(Board &board) noexcept override {
         const auto fromSquare = static_cast<const Square>(this->getFrom());
         const auto toSquare = static_cast<const Square>(this->getTo());
 

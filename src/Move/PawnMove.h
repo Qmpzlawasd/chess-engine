@@ -5,9 +5,9 @@
 
 class PawnMove : public Move {
   public:
-    PawnMove(const Move &move) : Move(move){};
+    explicit PawnMove(const Move &_move) noexcept : Move(_move){};
 
-    virtual void makeMove(Board &board) noexcept override {
+    void makeMove(Board &board) noexcept override {
         board.resetHalfMoveClock();
 
         const auto fromSquare = static_cast<const Square>(this->getFrom());

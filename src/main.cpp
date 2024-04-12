@@ -5,9 +5,11 @@
 int main(int argc, char *argv[]) {
     // idea when bishop is moved, restet only the danger tables for that sqare
     // draw no material
-    if (strncmp(argv[1], "check", 5) == 0) {
-        Pertf::runTests();
-        return 0;
+    if (argc != 1) {
+        if (strncmp(argv[1], "check", 5) == 0) {
+            Pertf::runTests();
+            return 0;
+        }
     }
     //    const std::string fenString = "rnbqkbnr/ppppppp1/8/7p/8/3P4/PPP1PPPP/RNBQKBNR w KQkq - 0 1";
     //    Board board{fenString};
