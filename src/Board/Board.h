@@ -11,6 +11,7 @@
 #include "MagicBitboard.h"
 #include "MagicValuesGeneratorInterface.h"
 #include "MagicValuesParallelGenerator.h"
+#include "Material.h"
 #include "Piece/JumpingPiece.h"
 #include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
@@ -37,6 +38,7 @@ class Board {
     Pawn pawns;
 
     Color turn;
+    Material material;
     BoardStatus status;
 
     Castle<WHITE> castleWhite;
@@ -146,13 +148,13 @@ class Board {
         : king{FEN::parsePiece(fen, 'K'), FEN::parsePiece(fen, 'k')}, queens{FEN::parsePiece(fen, 'Q'), FEN::parsePiece(fen, 'q')},
           rooks{FEN::parsePiece(fen, 'R'), FEN::parsePiece(fen, 'r')}, bishops{FEN::parsePiece(fen, 'B'), FEN::parsePiece(fen, 'b')},
           knights{FEN::parsePiece(fen, 'N'), FEN::parsePiece(fen, 'n')}, pawns{FEN::parsePiece(fen, 'P'), FEN::parsePiece(fen, 'p')},
-          turn{FEN::parseTurn(fen)}, status{IN_PROGRESS}, castleWhite{FEN::parseCastle<WHITE>(fen)},
-          castleBlack{FEN::parseCastle<BLACK>(fen)}, enPassant{FEN::parseEnPassant(fen)}, halfmoveClock{FEN::parseHalfmoveClock(fen)},
-          fullmoveNumber{FEN::parseFullmoveNumber(fen)}, pinnedMaskHVWhite{computePinMaskHV<WHITE>()},
-          pinnedMaskHVBlack{computePinMaskHV<BLACK>()}, pinnedMaskD12White{computePinMaskD12<WHITE>()},
-          pinnedMaskD12Black{computePinMaskD12<BLACK>()}, checkMaskWhite{computeCheckMask<WHITE>()},
-          checkMaskBlack{computeCheckMask<BLACK>()}, dangerTableWhite{computeDangerTable<WHITE>()}, dangerTableBlack{
-                                                                                                        computeDangerTable<BLACK>()} {};
+          turn{FEN::parseTurn(fen)}, material{FEN::getMaterialValue<BLACK>(fen), FEN::getMaterialValue<WHITE>(fen)},
+          status{material.init()}, castleWhite{FEN::parseCastle<WHITE>(fen)}, castleBlack{FEN::parseCastle<BLACK>(fen)},
+          enPassant{FEN::parseEnPassant(fen)}, halfmoveClock{FEN::parseHalfmoveClock(fen)}, fullmoveNumber{FEN::parseFullmoveNumber(fen)},
+          pinnedMaskHVWhite{computePinMaskHV<WHITE>()}, pinnedMaskHVBlack{computePinMaskHV<BLACK>()},
+          pinnedMaskD12White{computePinMaskD12<WHITE>()}, pinnedMaskD12Black{computePinMaskD12<BLACK>()},
+          checkMaskWhite{computeCheckMask<WHITE>()}, checkMaskBlack{computeCheckMask<BLACK>()},
+          dangerTableWhite{computeDangerTable<WHITE>()}, dangerTableBlack{computeDangerTable<BLACK>()} {};
 
     ~Board() = default;
 

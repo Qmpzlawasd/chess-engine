@@ -1,6 +1,7 @@
 #include "FEN.h"
 #include "Castle.h"
 #include "Enums/Colors.h"
+#include "Enums/Points.h"
 #include "Utils.h"
 
 Color FEN::parseTurn(const std::string &fen) {
@@ -96,3 +97,65 @@ uint64_t FEN::parsePiece(const std::string &fen, const char &piece) {
     }
     return bitboard;
 }
+
+template <Color side>
+uint8_t FEN::getMaterialValue(const std::string &fen) {
+    uint8_t materialCount = 0;
+    std::string piece;
+    if constexpr (side == WHITE) {
+        piece = "QBNPR";
+    } else {
+        piece = "qbnpr";
+    }
+
+    uint8_t slashesMet{0}, columnIndex{0};
+    for (const char &ch : fen) {
+        if (ch == ' ')
+            break;
+
+        if (ch == '/') {
+            ++slashesMet;
+            columnIndex = 0;
+        } else if (piece.contains(ch)) {
+            switch (ch) {
+            case 'q':
+            case 'Q': {
+                materialCount += QUEEN_POINTS;
+                break;
+            }
+            case 'b':
+            case 'B': {
+                materialCount += BISHOP_POINTS;
+                break;
+            }
+            case 'n':
+            case 'N': {
+                materialCount += KNIGHT_POINTS;
+                break;
+            }
+            case 'p':
+            case 'P': {
+                materialCount += PAWN_POINTS;
+                break;
+            }
+            case 'R':
+            case 'r': {
+                materialCount += ROOK_POINTS;
+                break;
+            }
+            default:
+                break;
+            }
+
+            ++columnIndex;
+        } else if (std::isdigit(ch)) {
+            columnIndex += ch - '0';
+        } else {
+            ++columnIndex;
+        }
+    }
+    return materialCount;
+}
+
+template uint8_t FEN::getMaterialValue<BLACK>(const std::string &);
+template uint8_t FEN::getMaterialValue<WHITE>(const std::string &);

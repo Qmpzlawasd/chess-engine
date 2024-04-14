@@ -30,6 +30,9 @@ class FEN {
      * @return bitboard
      */
     static uint64_t parsePiece(const std::string &, const char &);
+
+    template <Color>
+    static uint8_t getMaterialValue(const std::string &);
 };
 
 #endif // CHESS_ENGINE_FEN_H

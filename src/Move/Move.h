@@ -31,12 +31,16 @@ class Move {
 
         if (board.pawns.getBitboard<enemy>() & capture) {
             board.pawns.flipSquare<enemy>(Utils::popLSBCopy(capture));
+            board.status = board.material.registerPieceCapture<side, PAWN_POINTS>(board.status);
         } else if (board.knights.getBitboard<enemy>() & capture) {
             board.knights.flipSquare<enemy>(Utils::popLSBCopy(capture));
+            board.status = board.material.registerPieceCapture<side, KNIGHT_POINTS>(board.status);
         } else if (board.bishops.getBitboard<enemy>() & capture) {
             board.bishops.flipSquare<enemy>(Utils::popLSBCopy(capture));
+            board.status = board.material.registerPieceCapture<side, BISHOP_POINTS>(board.status);
         } else if (board.rooks.getBitboard<enemy>() & capture) {
             board.rooks.flipSquare<enemy>(Utils::popLSBCopy(capture));
+            board.status = board.material.registerPieceCapture<side, ROOK_POINTS>(board.status);
             if constexpr (enemy == WHITE) {
                 if (Utils::popLSBCopy(capture) == H1)
                     board.castleWhite.rookMoved<KING_SIDE>();
@@ -51,8 +55,7 @@ class Move {
 
         } else if (board.queens.getBitboard<enemy>() & capture) {
             board.queens.flipSquare<enemy>(Utils::popLSBCopy(capture));
-        } else if (board.king.getBitboard<enemy>() & capture) {
-            ;
+            board.status = board.material.registerPieceCapture<side, QUEEN_POINTS>(board.status);
         } else {
             puts("*PANIC, CAPTURE DOES NOT EXIST*");
             std::cout << move;

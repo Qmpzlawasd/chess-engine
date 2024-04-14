@@ -13,7 +13,7 @@
 
 template <Color side>
 [[nodiscard]] std::optional<std::vector<std::shared_ptr<Move>>> LegalMove::getLegalMoves() noexcept {
-    if (board.status != IN_PROGRESS)
+    if (board.status != IN_PROGRESS and board.status != INSUFFICIENT_MATERIAL_WHITE and board.status != INSUFFICIENT_MATERIAL_BLACK)
         return {};
 
     std::vector<std::shared_ptr<Move>> rook = getRookLegalMoves<side>();

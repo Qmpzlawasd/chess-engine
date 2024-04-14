@@ -92,6 +92,12 @@ uint64_t Board::getCastleRightsBitboard() const noexcept {
 }
 
 template <Color side>
+uint64_t Board::getOccupiedSquares() const {
+    return king.getBitboard<side>() | queens.getBitboard<side>() | rooks.getBitboard<side>() | bishops.getBitboard<side>() |
+           knights.getBitboard<side>() | pawns.getBitboard<side>();
+}
+
+template <Color side>
 uint64_t Board::isSquareAttacked(const Square &square) const {
     return rookAttacksSquare<side>(square) | bishopAttacksSquare<side>(square) | pawnAttacksSquare<side>(square) |
            kingAttacksSquare<side>(square) | queenAttacksSquare<side>(square) | knightAttacksSquare<side>(square);
