@@ -1,6 +1,8 @@
 #ifndef CHESS_ENGINE_PERTF_H
 #define CHESS_ENGINE_PERTF_H
 
+#include <cassert>
+#include <memory>
 #include <string>
 
 class Pertf {

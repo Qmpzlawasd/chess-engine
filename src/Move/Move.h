@@ -3,6 +3,7 @@
 
 #include "../Board/Board.h"
 #include "../Enums/Squares.h"
+#include "../PositionHash.h"
 #include "../Utils.h"
 
 #include <cstdint>
@@ -64,7 +65,7 @@ class Move {
     }
 
   public:
-    explicit Move(const uint16_t _move = 0) : move{_move} {};
+    explicit Move(const uint16_t &_move = 0) : move{_move} {};
     virtual void makeMove(Board &board) noexcept {
         board.halfmoveClock++;
 

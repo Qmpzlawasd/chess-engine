@@ -8,9 +8,6 @@
 #include "Enums/Colors.h"
 #include "Enums/Squares.h"
 #include "FEN.h"
-#include "MagicBitboard.h"
-#include "MagicValuesGeneratorInterface.h"
-#include "MagicValuesParallelGenerator.h"
 #include "Material.h"
 #include "Piece/JumpingPiece.h"
 #include "Piece/Piece.h"
@@ -49,6 +46,9 @@ class Board {
     uint16_t fullmoveNumber;
 
   private:
+    uint64_t hash;
+
+  private:
     uint64_t pinnedMaskHVWhite;
     uint64_t pinnedMaskHVBlack;
     uint64_t pinnedMaskD12White;
@@ -59,9 +59,17 @@ class Board {
     uint64_t dangerTableBlack;
 
   public:
+    [[nodiscard]] bool isGameOver() const noexcept {
+        return status != IN_PROGRESS and status != INSUFFICIENT_MATERIAL_WHITE and status != INSUFFICIENT_MATERIAL_BLACK;
+    };
+
+    [[nodiscard]] uint64_t getHash() const { return hash; };
+
+    void setHash(const uint64_t &_hash) { Board::hash = _hash; };
+
     void resetEnPassant() noexcept { enPassant = 0; };
 
-    void setEnPassant(const uint64_t &enapassant) noexcept { enPassant = enapassant; };
+    void setEnPassant(const uint64_t &_enPassant) noexcept { enPassant = _enPassant; };
 
     template <Color side>
     [[nodiscard]] uint64_t getOccupiedSquares() const;
@@ -78,14 +86,6 @@ class Board {
 
     bool checkDraw50MoveRule() noexcept {
         if (halfmoveClock >= 100) {
-            status = DRAW;
-            return true;
-        }
-        return false;
-    }
-
-    bool checkInsufficientMaterial() noexcept {
-        if (true) {
             status = DRAW;
             return true;
         }
@@ -149,12 +149,13 @@ class Board {
           rooks{FEN::parsePiece(fen, 'R'), FEN::parsePiece(fen, 'r')}, bishops{FEN::parsePiece(fen, 'B'), FEN::parsePiece(fen, 'b')},
           knights{FEN::parsePiece(fen, 'N'), FEN::parsePiece(fen, 'n')}, pawns{FEN::parsePiece(fen, 'P'), FEN::parsePiece(fen, 'p')},
           turn{FEN::parseTurn(fen)}, material{FEN::getMaterialValue<BLACK>(fen), FEN::getMaterialValue<WHITE>(fen)},
-          status{material.init()}, castleWhite{FEN::parseCastle<WHITE>(fen)}, castleBlack{FEN::parseCastle<BLACK>(fen)},
-          enPassant{FEN::parseEnPassant(fen)}, halfmoveClock{FEN::parseHalfmoveClock(fen)}, fullmoveNumber{FEN::parseFullmoveNumber(fen)},
-          pinnedMaskHVWhite{computePinMaskHV<WHITE>()}, pinnedMaskHVBlack{computePinMaskHV<BLACK>()},
-          pinnedMaskD12White{computePinMaskD12<WHITE>()}, pinnedMaskD12Black{computePinMaskD12<BLACK>()},
-          checkMaskWhite{computeCheckMask<WHITE>()}, checkMaskBlack{computeCheckMask<BLACK>()},
-          dangerTableWhite{computeDangerTable<WHITE>()}, dangerTableBlack{computeDangerTable<BLACK>()} {};
+          status{material.init()}, castleWhite{FEN::parseCastle<WHITE>(fen)},
+          castleBlack{FEN::parseCastle<BLACK>(fen)}, enPassant{FEN::parseEnPassant(fen)}, halfmoveClock{FEN::parseHalfmoveClock(fen)},
+          fullmoveNumber{FEN::parseFullmoveNumber(fen)}, hash{0}, pinnedMaskHVWhite{computePinMaskHV<WHITE>()},
+          pinnedMaskHVBlack{computePinMaskHV<BLACK>()}, pinnedMaskD12White{computePinMaskD12<WHITE>()},
+          pinnedMaskD12Black{computePinMaskD12<BLACK>()}, checkMaskWhite{computeCheckMask<WHITE>()},
+          checkMaskBlack{computeCheckMask<BLACK>()}, dangerTableWhite{computeDangerTable<WHITE>()}, dangerTableBlack{
+                                                                                                        computeDangerTable<BLACK>()} {};
 
     ~Board() = default;
 

@@ -5,9 +5,9 @@
 #include "../Piece/JumpingPiece.h"
 #include "Board.h"
 #include "Enums/Colors.h"
-#include <optional>
-
 #include <cstdint>
+#include <memory>
+#include <optional>
 
 class LegalMove {
     Board board;

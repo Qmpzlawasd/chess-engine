@@ -17,6 +17,7 @@ class Utils {
     static constexpr uint8_t COLUMN_NUMBER = 8;
 
     static constexpr uint8_t NUMBER_SQUARES_TABLE = ROW_NUMBER * COLUMN_NUMBER;
+    static constexpr uint8_t NUMBER_PIECE_TYPES = 6;
 
     static constexpr uint64_t A_FILE = 0x0101010101010101;
     static constexpr uint64_t H_FILE = 0x8080808080808080;
