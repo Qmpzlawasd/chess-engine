@@ -10,7 +10,7 @@ TEST_DIR = tests
 TARGET = main
 
 ENGINE_DEPS = $(wildcard $(SRC_DIR)/*.h)
-ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp) $(wildcard $(SRC_DIR)/Board/*.cpp)
+ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp) $(wildcard $(SRC_DIR)/Board/*.cpp) $(wildcard $(SRC_DIR)/PositionHash/*.cpp) $(wildcard $(SRC_DIR)/Game/*.cpp)
 
 .PHONY: pre-build all engine engine-debug run check
 
@@ -28,7 +28,7 @@ engine-debug: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 	$(CC) -o $(BUILD_DIR)/$(TARGET) $(ENGINE_SRCS) $(CFLAGS) $(CWARNING)
 
 check: engine
-	./$(BUILD_DIR)/$(TARGET) "check"
+	time ./$(BUILD_DIR)/$(TARGET) "check"
 
 run:
 	./$(BUILD_DIR)/$(TARGET)

@@ -3,8 +3,8 @@
 
 #include "../Board/Board.h"
 #include "../Enums/Squares.h"
-#include "../PositionHash.h"
 #include "../Utils.h"
+#include "PositionHash/PositionHash.h"
 
 #include <cstdint>
 #include <fstream>
@@ -21,6 +21,8 @@ class Move {
     uint16_t move;
 
   protected:
+    //    PositionHash::UpdateHashProps zobristHashProps;
+
     template <Color side>
     void makeCapture(Board &board, const Square &square) noexcept {
         constexpr Color enemy = Utils::flipColor(side);
@@ -28,18 +30,40 @@ class Move {
         if (!capture)
             return;
 
+        //        zobristHashProps.captureSquare = square;
+
         board.resetHalfMoveClock();
 
         if (board.pawns.getBitboard<enemy>() & capture) {
+            //            if constexpr (enemy == WHITE)
+            //                zobristHashProps.capturePiece = PAWN_WHITE;
+            //            else
+            //                zobristHashProps.capturePiece = PAWN_BLACK;
+
             board.pawns.flipSquare<enemy>(Utils::popLSBCopy(capture));
             board.status = board.material.registerPieceCapture<side, PAWN_POINTS>(board.status);
         } else if (board.knights.getBitboard<enemy>() & capture) {
+            //            if constexpr (enemy == WHITE)
+            //                zobristHashProps.capturePiece = KNIGHT_WHITE;
+            //            else
+            //                zobristHashProps.capturePiece = KNIGHT_BLACK;
+
             board.knights.flipSquare<enemy>(Utils::popLSBCopy(capture));
             board.status = board.material.registerPieceCapture<side, KNIGHT_POINTS>(board.status);
         } else if (board.bishops.getBitboard<enemy>() & capture) {
+            //            if constexpr (enemy == WHITE)
+            //                zobristHashProps.capturePiece = BISHOP_WHITE;
+            //            else
+            //                zobristHashProps.capturePiece = BISHOP_BLACK;
+
             board.bishops.flipSquare<enemy>(Utils::popLSBCopy(capture));
             board.status = board.material.registerPieceCapture<side, BISHOP_POINTS>(board.status);
         } else if (board.rooks.getBitboard<enemy>() & capture) {
+            //            if constexpr (enemy == WHITE)
+            //                zobristHashProps.capturePiece = ROOK_WHITE;
+            //            else
+            //                zobristHashProps.capturePiece = ROOK_BLACK;
+
             board.rooks.flipSquare<enemy>(Utils::popLSBCopy(capture));
             board.status = board.material.registerPieceCapture<side, ROOK_POINTS>(board.status);
             if constexpr (enemy == WHITE) {
@@ -55,16 +79,23 @@ class Move {
             }
 
         } else if (board.queens.getBitboard<enemy>() & capture) {
+            //            if constexpr (enemy == WHITE)
+            //                zobristHashProps.capturePiece = QUEEN_WHITE;
+            //            else
+            //                zobristHashProps.capturePiece = QUEEN_BLACK;
+
             board.queens.flipSquare<enemy>(Utils::popLSBCopy(capture));
             board.status = board.material.registerPieceCapture<side, QUEEN_POINTS>(board.status);
         } else {
-            puts("*PANIC, CAPTURE DOES NOT EXIST*");
+            puts("*PANIC, CAPTURE DOES NOT EXIST, MAYBE THE KING HAS BEEN TAKEN*");
             std::cout << move;
             puts("****************************");
         }
     }
 
   public:
+    //    PositionHash::UpdateHashProps getUpdateHashProps() noexcept { return zobristHashProps; }
+
     explicit Move(const uint16_t &_move = 0) : move{_move} {};
     virtual void makeMove(Board &board) noexcept {
         board.halfmoveClock++;

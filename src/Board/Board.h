@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <iostream>
+#include <memory>
+#include <queue>
 
 #include "Enums/BoardStatus.h"
 #include "Enums/Colors.h"
@@ -45,10 +47,9 @@ class Board {
     uint8_t halfmoveClock;
     uint16_t fullmoveNumber;
 
-  private:
+  protected:
     uint64_t hash;
 
-  private:
     uint64_t pinnedMaskHVWhite;
     uint64_t pinnedMaskHVBlack;
     uint64_t pinnedMaskD12White;
@@ -58,7 +59,14 @@ class Board {
     uint64_t dangerTableWhite;
     uint64_t dangerTableBlack;
 
+    //    std::queue<std::shared_ptr<Move>> moveHistory;
+
   public:
+    //    [[nodiscard]] bool isThreefoldRepetition() const noexcept {
+    //
+    //        return ;
+    //    };
+
     [[nodiscard]] bool isGameOver() const noexcept {
         return status != IN_PROGRESS and status != INSUFFICIENT_MATERIAL_WHITE and status != INSUFFICIENT_MATERIAL_BLACK;
     };

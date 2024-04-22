@@ -11,6 +11,9 @@ class RookMove : public Move {
         const auto fromSquare = static_cast<const Square>(this->getFrom());
         const auto toSquare = static_cast<const Square>(this->getTo());
 
+        //        zobristHashProps.toSquare = toSquare;
+        //        zobristHashProps.fromSquare = fromSquare;
+
         if (board.turn == WHITE) {
             Move::makeCapture<WHITE>(board, toSquare);
 

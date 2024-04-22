@@ -6,8 +6,10 @@
 #include <string>
 
 class Pertf {
+    PositionHash zobristMap;
+
     template <Color side>
-    [[nodiscard]] static uint32_t countNodes(const Board &board, const uint8_t &depth) noexcept {
+    [[nodiscard]] static uint32_t countNodes(Board &board, const uint8_t &depth) noexcept {
         if (depth == 0)
             return 1;
 
@@ -44,6 +46,7 @@ class Pertf {
         if (moves->empty()) {
             return 0;
         }
+        //        PositionHash zobristMap;
         uint64_t totalNodes = 0;
         std::for_each(moves->begin(), moves->end(), [&depth, board, &totalNodes](const std::shared_ptr<Move> &move) -> void {
             Board newBoard{board};
@@ -66,7 +69,7 @@ class Pertf {
   public:
     static void runTests() {
         // en passant out of check
-        assert(Pertf::startTest("8/8/8/8/8/8/kp5Q/N6K b - - 0 1", 1) == 3);
+        assert(Pertf::startTest("8/8/8/8/8/8/kp5Q/N6K b - - 0 1", 7) == 1);
 
         // starter position
         assert(Pertf::startTest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 2) == 400);

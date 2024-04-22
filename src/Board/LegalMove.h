@@ -10,13 +10,13 @@
 #include <optional>
 
 class LegalMove {
-    Board board;
+    Board &board;
 
   public:
     template <Color side>
     [[nodiscard]] bool handlePawnShenanigans(const Square &) noexcept;
 
-    explicit LegalMove(const Board &_board) noexcept : board{_board} {}
+    explicit LegalMove(Board &_board) noexcept : board{_board} {}
 
     template <Color side>
     [[nodiscard]] std::optional<std::vector<std::shared_ptr<Move>>> getLegalMoves() noexcept;
