@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -I $(SRC_DIR) -Wall -std=c++23 -pthread -Weffc++ -march=native -g
+CFLAGS = -I $(SRC_DIR) -Wall -std=c++23 -pthread -Weffc++ -march=native
 CWARNING = -pedantic -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused
 
 
@@ -10,7 +10,7 @@ TEST_DIR = tests
 TARGET = main
 
 ENGINE_DEPS = $(wildcard $(SRC_DIR)/*.h)
-ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp) $(wildcard $(SRC_DIR)/Board/*.cpp) $(wildcard $(SRC_DIR)/PositionHash/*.cpp) $(wildcard $(SRC_DIR)/Game/*.cpp)
+ENGINE_SRCS = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/Piece/*.cpp)  $(wildcard $(SRC_DIR)/Move/*.cpp) $(wildcard $(SRC_DIR)/Board/*.cpp) $(wildcard $(SRC_DIR)/PositionHash/*.cpp) $(wildcard $(SRC_DIR)/Game/*.cpp)  $(wildcard $(SRC_DIR)/Perft/*.cpp)  $(wildcard $(SRC_DIR)/MagicBitboards/*.cpp) $(wildcard $(SRC_DIR)/FEN/*.cpp) $(wildcard $(SRC_DIR)/NNUE/*.cpp)
 
 .PHONY: pre-build all engine engine-debug run check
 
@@ -28,7 +28,7 @@ engine-debug: $(ENGINE_SRCS) $(ENGINE_DEPS) pre-build
 	$(CC) -o $(BUILD_DIR)/$(TARGET) $(ENGINE_SRCS) $(CFLAGS) $(CWARNING)
 
 check: engine
-	time ./$(BUILD_DIR)/$(TARGET) "check"
+	./$(BUILD_DIR)/$(TARGET) "check"
 
 run:
 	./$(BUILD_DIR)/$(TARGET)

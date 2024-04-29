@@ -90,7 +90,7 @@ class Utils {
 
     static uint64_t getSetLineBetween(const Square &, const Square &);
 
-    static std::string_view squareToString(const Square &) noexcept;
+    static std::string squareToString(const Square &) noexcept;
 };
 
 #endif // CHESS_ENGINE_UTILS_H

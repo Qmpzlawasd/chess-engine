@@ -88,7 +88,7 @@ class Move {
             board.status = board.material.registerPieceCapture<side, QUEEN_POINTS>(board.status);
         } else {
             puts("*PANIC, CAPTURE DOES NOT EXIST, MAYBE THE KING HAS BEEN TAKEN*");
-            std::cout << move;
+            std::cout << *this;
             puts("****************************");
         }
     }
@@ -185,20 +185,25 @@ class Move {
 
     [[nodiscard]] bool isEnPassant() const { return (Move::move & 0x5) == 5; }
 
-    friend std::ostream &operator<<(std::ostream &os, const Move &_move) {
-
-        os << Utils::squareToString(static_cast<Square>(_move.getFrom())) << Utils::squareToString(static_cast<Square>(_move.getTo()));
-        if (_move.isPromotion()) {
-            if (_move.isQueenPromotion() or _move.isQueenPromotionCapture()) {
-                os << 'q';
-            } else if (_move.isRookPromotionCapture() or _move.isRookPromotion()) {
-                os << 'r';
-            } else if (_move.isBishopPromotionCapture() or _move.isBishopPromotion()) {
-                os << 'b';
-            } else if (_move.isKnightPromotion() or _move.isKnightPromotionCapture()) {
-                os << 'n';
+    [[nodiscard]] std::string toString() const {
+        std::string moveString =
+            Utils::squareToString(static_cast<Square>(this->getFrom())) + Utils::squareToString(static_cast<Square>(this->getTo()));
+        if (this->isPromotion()) {
+            if (this->isQueenPromotion() or this->isQueenPromotionCapture()) {
+                moveString += "q";
+            } else if (this->isRookPromotionCapture() or this->isRookPromotion()) {
+                moveString += "r";
+            } else if (this->isBishopPromotionCapture() or this->isBishopPromotion()) {
+                moveString += "b";
+            } else if (this->isKnightPromotion() or this->isKnightPromotionCapture()) {
+                moveString += "n";
             }
         }
+        return moveString;
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const Move &_move) {
+        os << _move.toString() << "\n";
         return os;
     }
     virtual ~Move() = default;

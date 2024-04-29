@@ -9,7 +9,7 @@
 #include "Enums/BoardStatus.h"
 #include "Enums/Colors.h"
 #include "Enums/Squares.h"
-#include "FEN.h"
+#include "FEN/FEN.h"
 #include "Material.h"
 #include "Piece/JumpingPiece.h"
 #include "Piece/Piece.h"

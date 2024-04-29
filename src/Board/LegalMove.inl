@@ -37,12 +37,12 @@ template <Color side>
     }
     std::vector<std::shared_ptr<Move>> allMoves;
     allMoves.reserve(movesSize);
-    allMoves.insert(allMoves.end(), rook.begin(), rook.end());
     allMoves.insert(allMoves.end(), queen.begin(), queen.end());
+    allMoves.insert(allMoves.end(), rook.begin(), rook.end());
     allMoves.insert(allMoves.end(), bishop.begin(), bishop.end());
     allMoves.insert(allMoves.end(), knight.begin(), knight.end());
-    allMoves.insert(allMoves.end(), king.begin(), king.end());
     allMoves.insert(allMoves.end(), pawn.begin(), pawn.end());
+    allMoves.insert(allMoves.end(), king.begin(), king.end());
 
     return allMoves;
 }

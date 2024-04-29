@@ -1,5 +1,5 @@
 #include "SlidingPiece.h"
-#include "../MagicBitboard.h"
+#include "MagicBitboards/MagicBitboard.h"
 
 uint64_t Rook::getNaiveAttackPattern(const Square &square) const noexcept {
     const uint8_t line = square % Utils::ROW_NUMBER;

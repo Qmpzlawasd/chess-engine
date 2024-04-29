@@ -41,7 +41,7 @@ uint64_t Utils::getSetLineBetween(const Square &square, const Square &square1) {
     return LINES_BETWEEN[static_cast<uint16_t>(square * 64 + square1)];
 }
 
-std::string_view Utils::squareToString(const Square &square) noexcept {
+std::string Utils::squareToString(const Square &square) noexcept {
 
     switch (square) {
     case A1:

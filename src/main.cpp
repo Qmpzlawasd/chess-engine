@@ -1,7 +1,10 @@
 #include "Board/LegalMove.h"
 #include "Game/Game.h"
-#include "Pertf.h"
+#include "Perft/Perft.h"
+#include "Uci.h"
 #include <cstring>
+
+
 
 int main(int argc, char *argv[]) {
     // idea when bishop is moved, restet only the danger tables for that sqare
@@ -11,9 +14,10 @@ int main(int argc, char *argv[]) {
 
     if (argc != 1) {
         if (strncmp(argv[1], "check", 5) == 0) {
-            Pertf::runTests();
+            Perft::runTests();
             return 0;
         }
     }
-    Game::start("Capsunica", "Piersicuta");
+        Uci a;
+        a.main();
 }

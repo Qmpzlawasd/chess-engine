@@ -4,6 +4,7 @@
 #include <chrono>
 class Time {
     std::chrono::time_point<std::chrono::steady_clock> startTime;
+    bool forceStop;
 
   private:
     template <class result_t = std::chrono::milliseconds,
@@ -14,18 +15,27 @@ class Time {
     }
 
   public:
-    explicit Time() : startTime() {}
+    float allowedMilliseconds = 6000;
+
+    explicit Time() : startTime{}, forceStop{false} {}
+
+    void signalStop() noexcept { forceStop = true; }
 
     void start() noexcept { startTime = std::chrono::steady_clock::now(); }
 
-    static constexpr float allowedMilliseconds = 6000;
 
     bool checkTimeIsUp() noexcept {
+        if (forceStop) {
+            forceStop = false;
+            return true;
+        }
+
         if (getElapsedMs().count() >= allowedMilliseconds) {
             puts("TimesUP");
             return true;
         }
         return false;
     }
+    long stop() noexcept { return getElapsedMs().count(); }
 };
 #endif // CHESS_ENGINE_TIME_H

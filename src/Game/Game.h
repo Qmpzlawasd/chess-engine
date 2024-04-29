@@ -1,23 +1,26 @@
 #ifndef CHESS_ENGINE_GAME_H
 #define CHESS_ENGINE_GAME_H
-
 #include "Game/Evaluation.h"
 #include "Game/Time.h"
+#include "NNUE/nnue.h"
 #include "PositionHash/PositionHash.h"
+#include <cctype>
+#include <cstdio>
+#include <cstring>
+#include <fcntl.h>
+#include <sys/stat.h>
+
 #include <limits>
 
 class Game {
-    static Evaluation evaluation;
-
-    static Time time;
-
-    static constexpr uint8_t maximumDepth = 3;
+    Evaluation evaluation;
+    static constexpr uint8_t maximumDepth = 1;
 
     template <Color side>
-    static std::shared_ptr<Move> iterativeDeepening(Board &board) {
-        std::shared_ptr<Move> bestMove = nullptr;
+    std::shared_ptr<Move> iterativeDeepening(Board &board) {
         float bestEval = std::numeric_limits<float>::min();
 
+        std::shared_ptr<Move> bestMove = nullptr;
         for (int depth = 1; depth <= maximumDepth; ++depth) {
             std::optional<std::vector<std::shared_ptr<Move>>> legalMoves = LegalMove{board}.getLegalMoves<side>();
             for (const std::shared_ptr<Move> &move : legalMoves.value_or(std::vector<std::shared_ptr<Move>>{})) {
@@ -41,7 +44,7 @@ class Game {
     }
 
     template <Color side>
-    static float alphaBetaSearch(Board &board, const uint8_t &depth, float alpha, float beta) {
+    float alphaBetaSearch(Board &board, const uint8_t &depth, float alpha, float beta) {
         if (depth == 0 or board.isGameOver()) {
             return evaluation.evaluate<side>(board);
         }
@@ -89,34 +92,18 @@ class Game {
     }
 
   public:
-    static void start(std::string_view white, std::string_view black) {
-        Board board{};
-        std::shared_ptr<Move> bestMove;
-        while (true) {
-            time.start();
-            if (board.turn == WHITE) {
-                bestMove = iterativeDeepening<WHITE>(board);
-            } else {
-                bestMove = iterativeDeepening<BLACK>(board);
-            }
+    Time time;
 
-            if (bestMove == nullptr) {
-                break;
-            }
-            std::cout << *bestMove << ' ';
+    Game() : evaluation(), time() {}
 
-            bestMove->makeMove(board);
+    std::shared_ptr<Move> start(Board &board) {
+        time.start();
+        if (board.turn == WHITE) {
+            return iterativeDeepening<WHITE>(board);
+        } else {
+            return iterativeDeepening<BLACK>(board);
         }
-        printResults(white, black, board);
-    }
-
-    static void printResults(std::string_view white, std::string_view black, const Board &board) {
-        std::cout << white << " VS " << black << " verdict: " << static_cast<uint16_t>(board.status)
-                  << " time: " << Time::allowedMilliseconds << '\n';
     }
 };
-
-Evaluation Game::evaluation;
-Time Game::time;
 
 #endif // CHESS_ENGINE_GAME_H
