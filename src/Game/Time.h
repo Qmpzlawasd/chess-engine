@@ -23,7 +23,6 @@ class Time {
 
     void start() noexcept { startTime = std::chrono::steady_clock::now(); }
 
-
     bool checkTimeIsUp() noexcept {
         if (forceStop) {
             forceStop = false;

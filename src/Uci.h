@@ -77,7 +77,7 @@ class Uci {
             searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
             searchThread.join();
             log(future.get()->toString());
-            std::cout << "bestmove " << future.get()->toString() <<  std::endl;
+            std::cout << "bestmove " << future.get()->toString() << std::endl;
 
         } else if (command == "quit") {
             game.time.signalStop();

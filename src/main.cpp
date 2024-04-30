@@ -4,8 +4,6 @@
 #include "Uci.h"
 #include <cstring>
 
-
-
 int main(int argc, char *argv[]) {
     // idea when bishop is moved, restet only the danger tables for that sqare
     // draw by repetition
@@ -18,6 +16,6 @@ int main(int argc, char *argv[]) {
             return 0;
         }
     }
-        Uci a;
-        a.main();
+    Uci a;
+    a.main();
 }
