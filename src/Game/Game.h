@@ -2,6 +2,7 @@
 #define CHESS_ENGINE_GAME_H
 #include "Game/Evaluation.h"
 #include "Game/Time.h"
+#include "Logger.h"
 #include "NNUE/nnue.h"
 #include "PositionHash/PositionHash.h"
 #include <cctype>
@@ -14,7 +15,7 @@
 
 class Game {
     Evaluation evaluation;
-    static constexpr uint8_t maximumDepth = 1;
+    static constexpr uint8_t maximumDepth = 15;
 
     template <Color side>
     std::shared_ptr<Move> iterativeDeepening(Board &board) {
@@ -36,6 +37,7 @@ class Game {
                 }
 
                 if (time.checkTimeIsUp()) {
+                    logger.log(std::format("DepthSearched= {}\n", depth));
                     return bestMove;
                 }
             }

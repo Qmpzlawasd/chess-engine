@@ -35,6 +35,6 @@ class Time {
         }
         return false;
     }
-    long stop() noexcept { return getElapsedMs().count(); }
+    unsigned long stop() noexcept { return static_cast<unsigned long>(getElapsedMs().count()); }
 };
 #endif // CHESS_ENGINE_TIME_H

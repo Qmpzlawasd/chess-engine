@@ -1,10 +1,10 @@
 #ifndef CHESS_ENGINE_UCI_H
 #define CHESS_ENGINE_UCI_H
+#include "Logger.h"
 #include <future>
 #include <iostream>
 
 class Uci {
-    std::ofstream f{"/home/stefan/KassE.log"};
     Game game;
     Board board;
     std::thread searchThread;
@@ -16,7 +16,7 @@ class Uci {
     void main() {
         std::string line;
         while (std::getline(std::cin, line)) {
-            log(line);
+            logger.log(line);
             std::stringstream ss(line);
             std::string command;
             ss >> command;
@@ -31,8 +31,6 @@ class Uci {
         } else if (command == "isready") {
             std::cout << "readyok" << std::endl;
 
-        } else if (command == "ucinewgame") {
-            0;
         } else if (command == "position") {
             std::string opponentMoveString;
             ss >> opponentMoveString; // discard startpos and moves
@@ -72,11 +70,19 @@ class Uci {
             else
                 game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
 
-            auto future = std::async(&Game::start, std::ref(game), std::ref(board));
+            //            game.time.allowedMilliseconds -= 5000;
             searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
             searchThread.join();
-            log(future.get()->toString());
-            std::cout << "bestmove " << future.get()->toString() << std::endl;
+
+            auto future = std::async(&Game::start, std::ref(game), std::ref(board));
+
+            std::shared_ptr<Move> bestMove = future.get();
+
+            std::cout << "bestmove " << *bestMove << std::endl;
+
+            logger.log(std::format("bestmove {}\n", bestMove->toString()));
+
+            bestMove->makeMove(board);
 
         } else if (command == "quit") {
             game.time.signalStop();
@@ -90,18 +96,6 @@ class Uci {
                 searchThread.join();
         } else {
             std::cout << command << '\n';
-        }
-    }
-
-    void log(std::string_view res) { f << res << std::endl; }
-
-    void handlePosition() {
-        std::string pos;
-        std::cin >> pos;
-        if (pos == "startpos") {
-            this->board = Board{};
-        } else {
-            this->board = Board{pos};
         }
     }
 };
