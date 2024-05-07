@@ -1,17 +1,16 @@
 #ifndef CHESS_ENGINE_GAME_H
 #define CHESS_ENGINE_GAME_H
+
 #include "Game/Evaluation.h"
 #include "Game/Time.h"
 #include "Logger.h"
-#include "NNUE/nnue.h"
 #include "PositionHash/PositionHash.h"
 #include <cctype>
 #include <cstdio>
 #include <cstring>
 #include <fcntl.h>
-#include <sys/stat.h>
-
 #include <limits>
+#include <sys/stat.h>
 
 class Game {
     Evaluation evaluation;
@@ -19,17 +18,20 @@ class Game {
 
     template <Color side>
     std::shared_ptr<Move> iterativeDeepening(Board &board) {
-        float bestEval = std::numeric_limits<float>::min();
+        int bestEval = std::numeric_limits<int>::min();
 
         std::shared_ptr<Move> bestMove = nullptr;
         for (int depth = 1; depth <= maximumDepth; ++depth) {
             std::optional<std::vector<std::shared_ptr<Move>>> legalMoves = LegalMove{board}.getLegalMoves<side>();
             for (const std::shared_ptr<Move> &move : legalMoves.value_or(std::vector<std::shared_ptr<Move>>{})) {
                 Board newBoard{board};
+
                 move->makeMove(newBoard);
 
-                float currentMoveEval =
-                    alphaBetaSearch<side>(newBoard, depth - 1, std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
+                int currentMoveEval = alphaBetaSearch<Utils::flipColor(side)>(newBoard,
+                                                                              depth - 1,
+                                                                              std::numeric_limits<int>::min(),
+                                                                              std::numeric_limits<int>::max());
 
                 if (currentMoveEval > bestEval) {
                     bestEval = currentMoveEval;
@@ -46,19 +48,23 @@ class Game {
     }
 
     template <Color side>
-    float alphaBetaSearch(Board &board, const uint8_t &depth, float alpha, float beta) {
+    int alphaBetaSearch(Board &board, const uint8_t &depth, int alpha, int beta) {
         if (depth == 0 or board.isGameOver()) {
-            return evaluation.evaluate<side>(board);
+            return evaluation.evaluate(board);
         }
 
         if constexpr (side == WHITE) {
-            float maxEval = std::numeric_limits<float>::min();
+            int maxEval = std::numeric_limits<int>::min();
+
             std::optional<std::vector<std::shared_ptr<Move>>> legalMoves = LegalMove{board}.getLegalMoves<side>();
-            for (const std::shared_ptr<Move> &move : legalMoves.value_or(std::vector<std::shared_ptr<Move>>{})) {
+            auto moves = legalMoves.value_or(std::vector<std::shared_ptr<Move>>{});
+            //            std::sort(moves.begin(), moves.end());
+            for (const std::shared_ptr<Move> &move : moves) {
                 Board newBoard{board};
                 move->makeMove(newBoard);
 
-                float eval = alphaBetaSearch<BLACK>(newBoard, depth - 1, alpha, beta);
+                int eval = alphaBetaSearch<BLACK>(newBoard, depth - 1, alpha, beta);
+
                 maxEval = std::max(maxEval, eval);
                 alpha = std::max(alpha, eval);
 
@@ -72,14 +78,17 @@ class Game {
             return maxEval;
 
         } else {
-            float minEval = std::numeric_limits<float>::max();
+            int minEval = std::numeric_limits<int>::max();
+
             std::optional<std::vector<std::shared_ptr<Move>>> legalMoves = LegalMove{board}.getLegalMoves<side>();
             for (const std::shared_ptr<Move> &move : legalMoves.value_or(std::vector<std::shared_ptr<Move>>{})) {
                 Board newBoard{board};
+
                 move->makeMove(newBoard);
 
-                float eval = alphaBetaSearch<WHITE>(newBoard, depth - 1, alpha, beta);
+                int eval = alphaBetaSearch<WHITE>(newBoard, depth - 1, alpha, beta);
                 minEval = std::min(minEval, eval);
+
                 beta = std::min(beta, eval);
 
                 if (time.checkTimeIsUp()) {

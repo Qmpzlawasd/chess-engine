@@ -2,19 +2,13 @@
 #define CHESS_ENGINE_EVALUATION_H
 
 #include "Enums/Colors.h"
+#include "NNUE/nnue.h"
 
 class Evaluation {
-    float eval(Board &board) { return 1; }
-
   public:
-    template <Color side>
-    float evaluate(Board &board) {
-        if constexpr (side == WHITE) {
-            return eval(board);
-        } else {
-            return eval(board);
-        }
-    }
+    Evaluation() { nnue_init("src/NNUE/nn-6b4236f2ec01.nnue"); };
+
+    int evaluate(const Board &board) { return board.callNNUE(); }
 };
 
 #endif // CHESS_ENGINE_EVALUATION_H

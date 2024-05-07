@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include <iostream>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -1187,7 +1188,8 @@ static bool verify_net(const void *evalData, size_t size) {
         return false;
 
     const char *d = (const char *)evalData;
-    //  if (readu_le_u32(d) != NnueVersion) return false;
+    if (readu_le_u32(d) != NnueVersion)
+        return false;
     if (readu_le_u32(d + 4) != 0x3e5aa6eeU)
         return false;
     if (readu_le_u32(d + 8) != 177)
@@ -1253,16 +1255,13 @@ static bool load_eval_file(const char *evalFile) {
 Interfaces
 */
 DLLExport void _CDECL nnue_init(const char *evalFile) {
-    printf("Loading NNUE : %s\n", evalFile);
     fflush(stdout);
 
     if (load_eval_file(evalFile)) {
-        printf("NNUE loaded !\n");
         fflush(stdout);
         return;
     }
 
-    printf("NNUE file not found!\n");
     fflush(stdout);
 }
 

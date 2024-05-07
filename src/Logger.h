@@ -5,10 +5,13 @@
 #include <ostream>
 
 class Logger {
-    std::ofstream f{"/home/stefan/Engine.log"};
+    std::ofstream outFile{"log/Engine.log"};
 
   public:
-    void log(auto res) { f << res << std::endl; }
+    void log(const auto &res) {
+        outFile << res << std::endl;
+        outFile.flush();
+    }
 };
 
 static Logger logger;

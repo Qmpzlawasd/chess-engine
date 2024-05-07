@@ -38,9 +38,9 @@ class Uci {
                 board = Board{};
                 return;
             }
-            while (ss >> opponentMoveString)
-                ;
-
+            while (ss >> opponentMoveString) {
+                std::cout << "discarded: " << opponentMoveString << '\n';
+            }
             LegalMove legalMove{board};
             std::vector<std::shared_ptr<Move>> legalMoves;
             if (board.turn == WHITE) {
@@ -71,12 +71,13 @@ class Uci {
                 game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
 
             //            game.time.allowedMilliseconds -= 5000;
-            searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
-            searchThread.join();
+            //            searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
 
-            auto future = std::async(&Game::start, std::ref(game), std::ref(board));
+            //            searchThread.join();
 
-            std::shared_ptr<Move> bestMove = future.get();
+            //            auto future = std::async(&Game::start, std::ref(game), std::ref(board));
+
+            std::shared_ptr<Move> bestMove = game.start(board);
 
             std::cout << "bestmove " << *bestMove << std::endl;
 

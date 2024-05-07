@@ -1,7 +1,7 @@
-#include <cctype>
-#include <cstdio>
-#include <cstring>
+#include <ctype.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 
 #include "misc.h"

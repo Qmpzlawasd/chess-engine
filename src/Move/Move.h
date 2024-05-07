@@ -151,7 +151,7 @@ class Move {
 
     void setQueenPromotionCapture() { Move::move |= 15; }
 
-    [[nodiscard]] uint8_t getTo() const { return move >> 0xA; }
+    [[nodiscard]] uint8_t getTo() const { return Move::move >> 0xA; }
 
     [[nodiscard]] uint8_t getFrom() const { return (move & 0x03F0) >> 0x4; }
 
@@ -206,6 +206,9 @@ class Move {
         os << _move.toString() << "\n";
         return os;
     }
+
+    bool operator<(const Move &mv) const { return this->isCapture() and not mv.isCapture(); }
+
     virtual ~Move() = default;
 };
 

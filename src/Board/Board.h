@@ -8,9 +8,12 @@
 
 #include "Enums/BoardStatus.h"
 #include "Enums/Colors.h"
+#include "Enums/Pieces.h"
 #include "Enums/Squares.h"
 #include "FEN/FEN.h"
+#include "Logger.h"
 #include "Material.h"
+#include "NNUE/nnue.h"
 #include "Piece/JumpingPiece.h"
 #include "Piece/Piece.h"
 #include "Piece/SlidingPiece.h"
@@ -108,6 +111,75 @@ class Board {
             status = WIN_BLACK;
         }
     }
+
+    [[nodiscard]] int callNNUE() const noexcept {
+        int pieces[33], squares[33], player;
+        if (turn == WHITE) {
+            player = 0;
+        } else {
+            player = 1;
+        }
+        uint8_t index = 2;
+
+        for (int r = 7; r >= 0; r--) {
+            for (int f = 0; f <= 7; f++) {
+                int i = r * 8 + f;
+                if (Utils::setSquare(static_cast<Square>(i)) & king.getBitboard<WHITE>()) {
+                    pieces[0] = KING_WHITE + 1;
+                    squares[0] = i;
+
+                } else if (Utils::setSquare(static_cast<Square>(i)) & king.getBitboard<BLACK>()) {
+                    pieces[1] = KING_BLACK + 1;
+                    squares[1] = i;
+
+                } else if (Utils::setSquare(static_cast<Square>(i)) & rooks.getBitboard<BLACK>()) {
+                    pieces[index] = ROOK_BLACK + 1;
+                    squares[index++] = i;
+
+                } else if (Utils::setSquare(static_cast<Square>(i)) & rooks.getBitboard<WHITE>()) {
+                    pieces[index] = ROOK_WHITE + 1;
+                    squares[index++] = i;
+
+                } else if (Utils::setSquare(static_cast<Square>(i)) & queens.getBitboard<WHITE>()) {
+                    pieces[index] = QUEEN_WHITE + 1;
+                    squares[index++] = i;
+
+                } else if (Utils::setSquare(static_cast<Square>(i)) & queens.getBitboard<BLACK>()) {
+                    pieces[index] = QUEEN_BLACK + 1;
+                    squares[index++] = i;
+
+                } else if (Utils::setSquare(static_cast<Square>(i)) & bishops.getBitboard<WHITE>()) {
+                    pieces[index] = BISHOP_WHITE + 1;
+
+                    squares[index++] = i;
+                } else if (Utils::setSquare(static_cast<Square>(i)) & bishops.getBitboard<BLACK>()) {
+                    pieces[index] = BISHOP_BLACK + 1;
+
+                    squares[index++] = i;
+                } else if (Utils::setSquare(static_cast<Square>(i)) & pawns.getBitboard<WHITE>()) {
+                    pieces[index] = PAWN_WHITE + 1;
+
+                    squares[index++] = i;
+                } else if (Utils::setSquare(static_cast<Square>(i)) & pawns.getBitboard<BLACK>()) {
+
+                    pieces[index] = PAWN_BLACK + 1;
+                    squares[index++] = i;
+                } else if (Utils::setSquare(static_cast<Square>(i)) & knights.getBitboard<WHITE>()) {
+                    pieces[index] = KNIGHT_WHITE + 1;
+
+                    squares[index++] = i;
+                } else if (Utils::setSquare(static_cast<Square>(i)) & knights.getBitboard<BLACK>()) {
+                    pieces[index] = KNIGHT_BLACK + 1;
+
+                    squares[index++] = i;
+                }
+            }
+        }
+
+        pieces[index] = 0;
+        squares[index] = 0;
+        return nnue_evaluate(player, pieces, squares);
+    };
 
     template <Color side>
     [[nodiscard]] uint64_t getCastleRightsBitboard() const noexcept;

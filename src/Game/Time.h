@@ -30,7 +30,6 @@ class Time {
         }
 
         if (getElapsedMs().count() >= allowedMilliseconds) {
-            puts("TimesUP");
             return true;
         }
         return false;
