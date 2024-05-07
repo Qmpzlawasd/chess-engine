@@ -38,20 +38,26 @@ class Uci {
                 board = Board{};
                 return;
             }
-            while (ss >> opponentMoveString) {
-                std::cout << "discarded: " << opponentMoveString << '\n';
-            }
+            while (ss >> opponentMoveString)
+                ;
+
             LegalMove legalMove{board};
             std::vector<std::shared_ptr<Move>> legalMoves;
             if (board.turn == WHITE) {
-                legalMoves = legalMove.getLegalMoves<WHITE>().value();
+                auto asd = legalMove.getLegalMoves<WHITE>();
+                assert(asd.has_value());
+                legalMoves = asd.value();
+
             } else {
-                legalMoves = legalMove.getLegalMoves<BLACK>().value();
+                auto asd = legalMove.getLegalMoves<BLACK>();
+                assert(asd.has_value());
+                legalMoves = asd.value();
             }
             auto opponentMove =
                 std::find_if(legalMoves.begin(), legalMoves.end(), [&opponentMoveString](const std::shared_ptr<Move> &currentMove) {
                     return currentMove->toString() == opponentMoveString;
                 });
+            assert(opponentMove != legalMoves.end());
             opponentMove->get()->makeMove(board);
 
         } else if (command == "go") {
@@ -66,7 +72,7 @@ class Uci {
             auto movesToGo = opponentMoveString;
 
             if (board.turn == WHITE)
-                game.time.allowedMilliseconds = std::stoi(whiteTime) / std::stoi(movesToGo);
+                game.time.allowedMilliseconds = 6000;
             else
                 game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
 
@@ -78,7 +84,7 @@ class Uci {
             //            auto future = std::async(&Game::start, std::ref(game), std::ref(board));
 
             std::shared_ptr<Move> bestMove = game.start(board);
-
+            assert(bestMove != nullptr);
             std::cout << "bestmove " << *bestMove << std::endl;
 
             logger.log(std::format("bestmove {}\n", bestMove->toString()));
