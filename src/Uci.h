@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include <future>
 #include <iostream>
+#include <sstream>
 
 class Uci {
     Game game;
@@ -87,7 +88,7 @@ class Uci {
             assert(bestMove != nullptr);
             std::cout << "bestmove " << *bestMove << std::endl;
 
-            logger.log(std::format("bestmove {}\n", bestMove->toString()));
+            logger.log("bestmove " + bestMove->toString() + "\n");
 
             bestMove->makeMove(board);
 

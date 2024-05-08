@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     //  go wtime 50000 btime 50000 movestogo 40
 
     if (argc != 1) {
-        if (strncmp(argv[1], "check", 5) == 0) {
+        if (strncmp(argv[1], "test", 5) == 0) {
             Perft::runTests();
             return 0;
         }
