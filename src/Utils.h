@@ -57,6 +57,12 @@ class Utils {
         }
     }
 
+    static std::pair<uint8_t, uint8_t> getCoordinates(const Square &square) {
+        const uint8_t column = square % Utils::ROW_NUMBER;
+        const uint8_t line = square / Utils::COLUMN_NUMBER;
+        return {column, line};
+    }
+
     [[nodiscard]] static consteval Color flipColor(const Color &color) {
         if (color == WHITE) {
             return BLACK;

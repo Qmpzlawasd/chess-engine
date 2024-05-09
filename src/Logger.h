@@ -8,8 +8,8 @@ class Logger {
     std::ofstream outFile{"log/Engine.log"};
 
   public:
-    void log(const auto &res) {
-        outFile << res << std::endl;
+    void log(const auto &res, std::string_view term = "\n") {
+        outFile << res << term;
         outFile.flush();
     }
 };

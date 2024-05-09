@@ -5,6 +5,7 @@
 #include "Enums/Colors.h"
 #include "Enums/Points.h"
 #include <cstdint>
+
 class Material {
     static constexpr uint8_t MINIMUM_MATERIAL = 3;
     uint8_t materialBlack;
@@ -58,6 +59,7 @@ class Material {
         }
         return currentStatus;
     }
+
     template <Color attackingSide, Points capturedPiece>
     BoardStatus registerPieceCapture(const BoardStatus &currentStatus) noexcept {
         if constexpr (attackingSide == WHITE) {
@@ -80,4 +82,5 @@ class Material {
         return currentStatus;
     }
 };
+
 #endif // CHESS_ENGINE_MATERIAL_H

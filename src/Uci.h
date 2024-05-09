@@ -75,7 +75,9 @@ class Uci {
             if (board.turn == WHITE)
                 game.time.allowedMilliseconds = 6000;
             else
-                game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
+                game.time.allowedMilliseconds = 6000;
+
+            //                game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
 
             //            game.time.allowedMilliseconds -= 5000;
             //            searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
