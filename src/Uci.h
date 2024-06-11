@@ -73,18 +73,13 @@ class Uci {
             auto movesToGo = opponentMoveString;
 
             if (board.turn == WHITE)
-                game.time.allowedMilliseconds = 6000;
+                game.time.allowedMilliseconds = std::stoi(whiteTime) / std::stoi(movesToGo);
             else
-                game.time.allowedMilliseconds = 6000;
+                game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
 
-            //                game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
-
-            //            game.time.allowedMilliseconds -= 5000;
-            //            searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
-
-            //            searchThread.join();
-
-            //            auto future = std::async(&Game::start, std::ref(game), std::ref(board));
+            //                        searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
+            //                        searchThread.join();
+            //                        auto future = std::async(&Game::start, std::ref(game), std::ref(board));
 
             std::shared_ptr<Move> bestMove = game.start(board);
             assert(bestMove != nullptr);

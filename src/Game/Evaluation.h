@@ -184,9 +184,10 @@ class Evaluation {
     Evaluation() { nnue_init("src/NNUE/nn-6b4236f2ec01.nnue"); };
 
     int evaluate(const Board &board) {
+        return board.callNNUE();
         const int eval = computeWhiteEvaluation(board) - computeBlackEvaluation(board);
         int perspective = board.turn == WHITE ? 1 : -1;
-        return eval * perspective + board.callNNUE();
+        return eval * perspective;
     }
 };
 

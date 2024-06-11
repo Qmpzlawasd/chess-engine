@@ -28,6 +28,7 @@ class Game {
         this->bestMove = nullptr;
         this->numNodes = 0;
         this->numCutoffs = 0;
+        //        this->bestMoveEvaluation = 0;
         int depth;
         for (depth = 1; depth <= maximumDepth; ++depth) {
             alphaBetaSearch<side>(board, depth, 0, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
@@ -37,96 +38,74 @@ class Game {
             }
         }
         std::stringstream ss;
-        ss << "DepthSearched= " << depth << " Evaluation= " << -bestMoveEvaluation << " NodesSearched= " << numNodes
+        ss << "DepthSearched= " << depth << " Evaluation= " << bestMoveEvaluation << " NodesSearched= " << numNodes
            << " Cutoffs= " << numCutoffs << '\n';
         logger.log(ss.str());
     }
 
     template <Color side>
     int alphaBetaSearch(Board &board, const uint8_t &depth, const uint64_t &ply, int alpha, int beta) {
+
         if (depth == 0 or board.isGameOver()) {
             return evaluation.evaluate(board);
-            return QuiescenceSearch(board, alpha, beta);
         }
         std::optional<std::vector<std::shared_ptr<Move>>> legalMoves;
-        if (board.turn == WHITE) {
+        if constexpr (side == WHITE) {
             legalMoves = LegalMove{board}.getLegalMoves<WHITE>();
         } else {
             legalMoves = LegalMove{board}.getLegalMoves<BLACK>();
         }
 
         auto moves = legalMoves.value_or(std::vector<std::shared_ptr<Move>>{});
-        //        std::sort(moves.begin(), moves.end());
+        //                std::ranges::sort(moves, [&board](const std::shared_ptr<Move> &a, const std::shared_ptr<Move> &b) -> bool {
+        //
+        //                    if (a->isCapture() or b->isCapture()) {
+        //                        return a->isCapture() and not b->isCapture();
+        //                    }
+        //                    uint64_t enemyPieces;
+        //                    if constexpr (side == WHITE) {
+        //                        enemyPieces = board.getOccupiedSquares<BLACK>();
+        //                    } else {
+        //                        enemyPieces = board.getOccupiedSquares<WHITE>();
+        //                    }
+        //                    return (enemyPieces & Utils::setSquare(static_cast<Square>(a->getTo()))) and not  (enemyPieces &
+        //                    Utils::setSquare(static_cast<Square>(b->getTo()))) ;
+        //
+        //                });
+
+        int bestScore = std::numeric_limits<int>::min();
         for (const std::shared_ptr<Move> &move : moves) {
+            if (time.checkTimeIsUp()) {
+                break;
+            }
             Board newBoard{board};
             move->makeMove(newBoard);
-            int score = -alphaBetaSearch<side>(newBoard, depth - 1, ply + 1, -beta, -alpha);
-            numNodes++;
-            if (score >= beta) {
-                numCutoffs++;
-                return beta;
+            int score = -alphaBetaSearch<Utils::flipColor(side)>(newBoard, depth - 1, ply + 1, -beta, -alpha);
+            if (ply == 0) {
+                logger.log(move->toString(), " -> ");
+                logger.log(score);
             }
-
-            if (score > alpha) {
+            numNodes++;
+            if (score > bestScore) {
                 alpha = score;
                 if (ply == 0) {
                     bestMove = move;
                     bestMoveEvaluation = score;
                 }
+                bestScore = score;
             }
-            if (time.checkTimeIsUp()) {
-                return alpha;
+
+            if (bestScore > alpha) {
+                alpha = bestScore;
             }
-        }
 
-        return alpha;
-    }
-
-    int QuiescenceSearch(Board &board, int alpha, int beta) {
-        int eval = evaluation.evaluate(board);
-        numNodes++;
-        if (eval >= beta) {
-            numCutoffs++;
-            return beta;
-        }
-        if (eval > alpha) {
-            alpha = eval;
-        }
-
-        std::optional<std::vector<std::shared_ptr<Move>>> legalMoves;
-        if (board.turn == WHITE) {
-            legalMoves = LegalMove{board}.getLegalMoves<WHITE>();
-        } else {
-            legalMoves = LegalMove{board}.getLegalMoves<BLACK>();
-        }
-        auto moves = legalMoves.value_or(std::vector<std::shared_ptr<Move>>{});
-        logger.log(moves.size(), " -> ");
-        moves.erase(std::remove_if(begin(moves),
-                                   end(moves),
-                                   [&board](const std::shared_ptr<Move> &move) {
-                                       return Utils::setSquare(static_cast<Square>(move->getTo())) &
-                                              (board.turn == WHITE ? board.getOccupiedSquares<BLACK>() : board.getOccupiedSquares<WHITE>());
-                                   }),
-                    end(moves));
-        logger.log(moves.size());
-        for (const std::shared_ptr<Move> &move : moves) {
-            Board newBoard{board};
-            move->makeMove(newBoard);
-            eval = -QuiescenceSearch(newBoard, -beta, -alpha);
-
-            if (eval >= beta) {
+            if (alpha >= beta) {
                 numCutoffs++;
                 return beta;
             }
-            if (eval > alpha) {
-                alpha = eval;
-            }
-            if (time.checkTimeIsUp()) {
-                return alpha;
-            }
         }
 
-        return alpha;
+        return bestScore;
     }
 
   public:

@@ -207,8 +207,6 @@ class Move {
         return os;
     }
 
-    bool operator<(const Move &mv) const { return this->isCapture() and not mv.isCapture(); }
-
     virtual ~Move() = default;
 };
 
