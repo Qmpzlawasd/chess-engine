@@ -30,5 +30,5 @@ test:
 	./$(BUILD_DIR)/$(TARGET) "test"
 
 run:
-	echo ./$(BUILD_DIR)/$(TARGET)
+	./$(BUILD_DIR)/$(TARGET)
 

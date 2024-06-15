@@ -36,6 +36,7 @@ class Game {
             if (time.checkTimeIsUp()) {
                 break;
             }
+            std::cout << "info depth " << depth << " nodes " << numNodes << " score cp " << bestMoveEvaluation << " pv " << *bestMove;
         }
         std::stringstream ss;
         ss << "DepthSearched= " << depth << " Evaluation= " << bestMoveEvaluation << " NodesSearched= " << numNodes
@@ -81,10 +82,6 @@ class Game {
             Board newBoard{board};
             move->makeMove(newBoard);
             int score = -alphaBetaSearch<Utils::flipColor(side)>(newBoard, depth - 1, ply + 1, -beta, -alpha);
-            if (ply == 0) {
-                logger.log(move->toString(), " -> ");
-                logger.log(score);
-            }
             numNodes++;
             if (score > bestScore) {
                 alpha = score;

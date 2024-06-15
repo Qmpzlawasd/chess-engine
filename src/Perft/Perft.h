@@ -62,6 +62,30 @@ class Perft {
     }
 
   public:
+    static uint64_t startTest(Board board, const uint8_t &depth) noexcept {
+        LegalMove legalMove{board};
+        std::optional<std::vector<std::shared_ptr<Move>>> moves;
+        if (board.turn == WHITE) {
+            moves = legalMove.getLegalMoves<WHITE>();
+        } else {
+            moves = legalMove.getLegalMoves<BLACK>();
+        }
+        if (moves->empty()) {
+            return 0;
+        }
+
+        uint64_t totalNodes;
+        time.start();
+        if (board.turn == WHITE) {
+            totalNodes = countNodes<WHITE>(board, depth);
+        } else {
+            totalNodes = countNodes<BLACK>(board, depth);
+        }
+
+        std::cout << "nodes: " << totalNodes << " nps: " << totalNodes / (time.stop() + 1) * 1000 << std::endl;
+        return totalNodes;
+    }
+
     static void runTests() {
         // en passant out of check
         assert(Perft::startTest("8/8/8/8/8/8/kp5Q/N6K b - - 0 1", 1) == 3);

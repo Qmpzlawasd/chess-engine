@@ -35,6 +35,13 @@ class Uci {
         } else if (command == "position") {
             std::string opponentMoveString;
             ss >> opponentMoveString; // discard startpos and moves
+            if (opponentMoveString == "fen") {
+
+                std::getline(ss, opponentMoveString); // the whole stream into variable s
+                board = Board{opponentMoveString.substr(1, opponentMoveString.size())};
+                return;
+            }
+
             if (!(ss >> opponentMoveString)) {
                 board = Board{};
                 return;
@@ -62,8 +69,17 @@ class Uci {
             opponentMove->get()->makeMove(board);
 
         } else if (command == "go") {
+
             std::string opponentMoveString;
-            ss >> opponentMoveString >> opponentMoveString; // wtime
+            ss >> opponentMoveString; // wtime
+            if (opponentMoveString == "perft") {
+                int depth;
+                ss >> depth; // number depth
+                Perft::startTest(board, depth);
+                return;
+            }
+
+            ss >> opponentMoveString; // wtime
             auto whiteTime = opponentMoveString;
 
             ss >> opponentMoveString >> opponentMoveString; // btime
@@ -77,28 +93,20 @@ class Uci {
             else
                 game.time.allowedMilliseconds = std::stoi(blackTime) / std::stoi(movesToGo);
 
-            //                        searchThread = std::thread{&Game::start, std::ref(game), std::ref(board)};
-            //                        searchThread.join();
-            //                        auto future = std::async(&Game::start, std::ref(game), std::ref(board));
-
             std::shared_ptr<Move> bestMove = game.start(board);
             assert(bestMove != nullptr);
             std::cout << "bestmove " << *bestMove << std::endl;
 
-            logger.log("bestmove " + bestMove->toString() + "\n");
+            logger.log("bestmove " + bestMove->toString());
 
             bestMove->makeMove(board);
 
         } else if (command == "quit") {
             game.time.signalStop();
-            if (searchThread.joinable())
-                searchThread.join();
             exit(0);
 
         } else if (command == "stop") {
             game.time.signalStop();
-            if (searchThread.joinable())
-                searchThread.join();
         } else {
             std::cout << command << '\n';
         }
